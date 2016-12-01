@@ -8,22 +8,24 @@ import sys
 from time import *
 
 
-SELECTION_ROULETTE = 1
-SELECTION_TOURNAMENT = 2
+ROULETTE = 1
+FILL_NEXT_GENERATION = 2
+
+CHILD_FLIP=10
 
 class B(Exception):
     pass
 
 class GenecticException(B):
     what = None
-    pass
 
 class GeneticAlgorithm:
 
 
-    def __init__(self, n_chromosomes, itmax=50,fun_fitness=None ,selection_type=SELECTION_TOURNAMENT,High_Low=False, size_pull=1000, porcent_elitism=10, porcent_mute = 2):
+    def __init__(self, n_chromosomes,fun_fitness, itmax=50, child_type=CHILD_FLIP, selection_type=FILL_NEXT_GENERATION,
+                 High_Low=False, size_pull=1000, porcent_elitism=10, porcent_mute = 2):
 
-        if selection_type not in [SELECTION_ROULETTE,SELECTION_TOURNAMENT]:
+        if selection_type not in [ROULETTE, FILL_NEXT_GENERATION]:
             a = GenecticException
             a.what = "Error: selection_type is not correct."
             raise a
@@ -52,6 +54,9 @@ class GeneticAlgorithm:
         self.__pull=self.__Generate_pull()
         self.__FUN_FITNESS=fun_fitness
         self.__ITMAX=itmax
+        self.__TYPECHILD=child_type
+        self.__rangechild=(int)(self.__SIZE_PULL - self.__SIZE_PULL * self.__ELITISM)
+        self.__sizeelitism=(int)(self.__SIZE_PULL * self.__ELITISM)
 
     def __Generate_pull(self):
         new_pull = [[[0 for x in range(self.__N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_PULL)]
@@ -81,29 +86,36 @@ class GeneticAlgorithm:
     def __sort_pull(self, rever=False):
         self.__pull.sort(key=self.__getKey, reverse=rever)
 
-    def __Next_Generation_Tournamet(self):
+    def __Generate_Child_flip(self, item):
+        child = copy.copy(item)
+        index = [randint(0, self.__N_CHROMOSOMES - 1), randint(0, self.__N_CHROMOSOMES - 1)]
+        index.sort()
+        revert = copy.copy(item[index[0]:index[1]])
+        child[index[0]:index[1]] = revert[::-1]
+        return child
+
+    def __Generate_Child(self, item):
+        if self.__TYPECHILD is CHILD_FLIP:
+            return self.__Generate_Child_flip(item)
+
+    def __Fill_Next_Generation(self):
         new_pull=copy.copy(self.__pull)
-        for i in (range(0, int(self.__SIZE_PULL - self.__SIZE_PULL * self.__ELITISM))):
-            child = copy.copy(self.__pull[i][0])
-            dest = i + int(self.__SIZE_PULL * self.__ELITISM)
+        for i in (range(0, self.__rangechild)):
+            child = self.__Generate_Child(copy.copy(self.__pull[i][0]))
+            dest = i + self.__sizeelitism
             if randint(0, 99) < self.__MUTE:
                 child = self.__mute_individuals(child)
-            else:
-                index = [randint(0, self.__N_CHROMOSOMES - 1), randint(0, self.__N_CHROMOSOMES - 1)]
-                index.sort()
-                revert = copy.copy(child[index[0]:index[1]])
-                child[index[0]:index[1]] = copy.copy(revert[::-1])
             new_pull[dest][0] = copy.copy(child)
         return new_pull
 
-    def __Next_Generation_ROULETE(self):
+    def __Roulette(self):
         None
 
     def __Next_Generation(self):
-        if self.__SELECTION_TYPE is SELECTION_TOURNAMENT:
-            self.__Next_Generation_Tournamet()
-        elif self.__SELECTION_TYPE is SELECTION_ROULETTE:
-            None
+        if self.__SELECTION_TYPE is FILL_NEXT_GENERATION:
+            self.__Fill_Next_Generation()
+        elif self.__SELECTION_TYPE is ROULETTE:
+            self.__Roulette()
 
     def __mute_individuals(self, item):
         index = [randint(0, self.__N_CHROMOSOMES - 1), randint(0, self.__N_CHROMOSOMES - 1)]
@@ -124,21 +136,16 @@ class GeneticAlgorithm:
         return self.__pull[0][:]
 
     def run(self):
-        if self.__FUN_FITNESS is not None:
-            for x in range(self.__ITMAX):
-                print "\rThe winer is: ", self.Winner_Probability()[1],
-                for i in range(self.__SIZE_PULL):
-                    item=self.__Get_Individuos(i)
-                    self.__Set_Fittnes(i, self.__FUN_FITNESS(item))
-                self.__sort_pull(self.__REVERSE)
-                self.__Next_Generation()
-            print "\rThe winer is: ",self.Winner_Probability()
-        else:
-            a = GenecticException
-            a.what = "Error: fun_Fitnes is None"
-            raise a
-            exit(-1)
-            return -1
+        self.__Next_Generation()
+        for x in range(self.__ITMAX):
+            self.__Next_Generation()
+            print "\rThe winer is: ", self.Winner_Probability()[1],
+            for i in range(self.__SIZE_PULL):
+                item=self.__Get_Individuos(i)
+                self.__Set_Fittnes(i, self.__FUN_FITNESS(item))
+            self.__sort_pull(self.__REVERSE)
+
+        print "\rThe winer is: ",self.Winner_Probability()
 
 
 
