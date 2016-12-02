@@ -124,7 +124,7 @@ if __name__ == "__main__":
     f=fitnnes
     try:
         GA=GeneticAlgorithm(N_CHROMOSOMES, itmax=ITMAX, fun_fitness=f, selection_type=SELECTION_TYPE,
-                            High_Low=HIGH_LOW, size_pull=SIZE_PULL, child_type=TYPECHILD, porcent_elitism=ELITISM, porcent_mute=MUTE)
+                            High_Low=HIGH_LOW, size_pool=SIZE_PULL, child_type=TYPECHILD, porcent_elitism=ELITISM, porcent_mute=MUTE)
     except GenecticException:
         print GenecticException.what
     try:
