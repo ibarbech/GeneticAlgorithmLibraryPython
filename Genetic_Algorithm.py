@@ -1,6 +1,5 @@
 from __builtin__ import str
 
-import cv2
 import numpy
 from random import *
 import copy
@@ -29,22 +28,18 @@ class GeneticAlgorithm:
             a = GenecticException
             a.what = "Error: selection_type is not correct."
             raise a
-            exit(-1)
         if porcent_elitism not in range(100):
             a = GenecticException
             a.what = "Error: porcent_elitism not in range [0,100]"
             raise a
-            exit(-1)
         if porcent_mute not in range(100):
             a = GenecticException
             a.what = "Error: porcent_mute not in range [0,100]"
             raise a
-            exit(-1)
         if High_Low not in [True,False]:
             a = GenecticException
             a.what = "Error: High_Low must be True or False","Error: fun_fitness is None"
             raise a
-            exit(-1)
         self.__ELITISM = porcent_elitism / 100.0
         self.__MUTE = porcent_mute
         self.__REVERSE = High_Low
@@ -72,7 +67,6 @@ class GeneticAlgorithm:
             a = GenecticException
             a.what = "Error: individual",individual," not existing, 0 <= individual < " + str(self.__SIZE_PULL)
             raise a
-            return -1
         return copy.copy(self.__pull[individual][0])
 
     def __Set_Fittnes(self, individual, Fittnes):
@@ -80,7 +74,6 @@ class GeneticAlgorithm:
             a = GenecticException
             a.what = "Error: individual",individual," not existing, 0 <= individual < " + str(self.__SIZE_PULL)
             raise a
-            exit(-1)
         self.__pull[individual][1]=Fittnes
 
     def __sort_pull(self, rever=False):
@@ -107,6 +100,24 @@ class GeneticAlgorithm:
                 child = self.__mute_individuals(child)
             new_pull[dest][0] = copy.copy(child)
         return new_pull
+
+    """
+        Function that select the best item from a list of items for tournament selection.
+    """
+    def __Tournament_Selection_Deterministic(self,listItems):
+
+        dict = {}
+        for i in range(0,len(listItems)):
+            dict[i] = self.__FUN_FITNESS(listItems[i])
+        return listItems[sorted(dict,reverse=True)[0]]
+
+    """
+        Function that select the best item from a list of items for tournament selection.
+    """
+    def __Tournament_Selection_Probabilistic(self,listItems):
+        return listItems[randint(0,len(listItems)-1)]
+
+    
 
     def __Roulette(self):
         None
