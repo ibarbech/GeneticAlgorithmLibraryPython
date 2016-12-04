@@ -1,12 +1,7 @@
 from __builtin__ import str
 
-import cv2
-import numpy
 from random import *
 import copy
-import sys
-from time import *
-
 
 ROULETTE = 1
 FILL_NEXT_GENERATION = 2
@@ -16,6 +11,7 @@ CHILD_SPLIT = 11
 
 class B(Exception):
     pass
+
 
 class GenecticException(B):
     what = None
@@ -34,28 +30,24 @@ class GeneticAlgorithm:
 
 
     def __init__(self,fun_fitness, chromosomes, itmax = 50, child_type = CHILD_FLIP, selection_type = FILL_NEXT_GENERATION,
-                 High_Low = False, size_pull = 1000, porcent_elitism = 10, porcent_mute = 2):
+                 High_Low = False, size_pull = 1000, porcent_elitism = 10, porcent_mute = 2, testing=False):
 
         if selection_type not in [ROULETTE, FILL_NEXT_GENERATION]:
             a = GenecticException
             a.what = "Error: selection_type is not correct."
             raise a
-            exit(-1)
         if porcent_elitism not in range(100):
             a = GenecticException
             a.what = "Error: porcent_elitism not in range [0,100]"
             raise a
-            exit(-1)
         if porcent_mute not in range(100):
             a = GenecticException
             a.what = "Error: porcent_mute not in range [0,100]"
             raise a
-            exit(-1)
-        if High_Low not in [True,False]:
+        if High_Low not in [True, False]:
             a = GenecticException
-            a.what = "Error: High_Low must be True or False","Error: fun_fitness is None"
+            a.what = "Error: High_Low must be True or False", "Error: fun_fitness is None"
             raise a
-            exit(-1)
         self.__ELITISM = porcent_elitism / 100.0
         self.__MUTE = porcent_mute
         self.__REVERSE = High_Low
@@ -71,7 +63,9 @@ class GeneticAlgorithm:
         self.__CHRO_MAXVALUE = chromosomes.MAXVALUE
         self.__CHRO_MINVALUE = chromosomes.MINVALUE
         self.__pull = self.__Generate_pull()
+        self.__TEST_POOL = testing  # Flag for testing purpose
 
+        
     def __Generate_pull(self):
         if self.__CHRO_IS_F is False:
             ind = range(self.__CHRO_MINVALUE, self.__CHRO_MAXVALUE)
@@ -85,11 +79,10 @@ class GeneticAlgorithm:
         return item[1]
 
     def __Get_Individuos(self, individual):
-        if individual not in range(0, self.__SIZE_PULL):
+        if individual not in range(0, self.__SIZE_POOL):
             a = GenecticException
             a.what = "Error: individual",individual," not existing, 0 < = individual < " + str(self.__SIZE_PULL)
             raise a
-            return -1
         return copy.copy(self.__pull[individual][0])
 
     def __Set_Fittnes(self, individual, Fittnes):
@@ -97,7 +90,6 @@ class GeneticAlgorithm:
             a = GenecticException
             a.what = "Error: individual",individual," not existing, 0 < = individual < " + str(self.__SIZE_PULL)
             raise a
-            exit(-1)
         self.__pull[individual][1] = Fittnes
 
     def __sort_pull(self, rever = False):
@@ -110,6 +102,27 @@ class GeneticAlgorithm:
         revert = copy.copy(item[index[0]:index[1]])
         child[index[0]:index[1]] = revert[::-1]
         return child
+
+    """
+        Generate two sons by flip method, after that it returns the best between Father and the two sons.
+    """
+
+    def __Generate_Child_tournament_Det(self, item):
+        child = copy.copy(item)
+        index = [randint(0, self.__N_CHROMOSOMES - 1), randint(0, self.__N_CHROMOSOMES - 1)]
+        index.sort()
+        revert = copy.copy(item[index[0]:index[1]])
+        child[index[0]:index[1]] = revert[::-1]
+
+        child2 = copy.copy(item)
+        revert2left = child2[0:index[0]]
+        revert2right = child2[index[1]: self.__N_CHROMOSOMES - 1]
+        child2[0:index[0]] = revert2left[::-1]
+        child2[index[1]:self.__N_CHROMOSOMES - 1] = revert2right[::-1]
+
+        listIndividual = [item, child, child2]
+        return self.__Tournament_Selection_Deterministic(listIndividual)
+
 
     def __Generate_Child_split(self, item1,item2):
         child1 = copy.copy(item1)
@@ -157,6 +170,33 @@ class GeneticAlgorithm:
                 new_pull[dest1][0] = copy.copy(childs[0])
                 new_pull[dest2][0] = copy.copy(childs[1])
         return new_pull
+
+    """
+        Function that select the best item from a list of items for tournament selection.
+    """
+
+    def __Tournament_Selection_Deterministic(self, listItems):
+
+        dict = {}
+        for i in range(0, len(listItems)):
+            dict[i] = self.__FUN_FITNESS(listItems[i])
+        return listItems[sorted(dict, reverse=True)[0]]
+
+    """
+        Function that select the best item from a list of items for tournament selection.
+    """
+
+    def __Tournament_Selection_Probabilistic(self, listItems):
+        return listItems[randint(0, len(listItems) - 1)]
+
+    """
+        Asign a predefined pool and activate testing mode
+    """
+
+    def setPool(self, new_Pool):
+        self.__TEST_POOL = True
+        for i in range(0, self.__SIZE_POOL):
+            self.__POOL[i][0] = copy.copy(new_Pool[i])
 
     def __Roulette(self):
         new_pull = copy.copy(self.__pull)
@@ -214,6 +254,7 @@ class GeneticAlgorithm:
     def __mute_individuals_simple(self, item):
         return sample(item, self.__N_CHROMOSOMES)
 
+	# TODO - DEPRECATED
     def set_pull(self, pull):
         self.__pull = copy.copy(pull)
 
