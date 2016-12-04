@@ -94,6 +94,14 @@ class GeneticAlgorithm:
         child[index[0]:index[1]] = revert[::-1]
         return child
 
+    def __Generate_Child_flip(self, item):
+        child = copy.copy(item)
+        index = [randint(0, self.__N_CHROMOSOMES - 1), randint(0, self.__N_CHROMOSOMES - 1)]
+        index.sort()
+        revert = copy.copy(item[index[0]:index[1]])
+        child[index[0]:index[1]] = revert[::-1]
+        return child
+
     def __Generate_Child(self, item):
         if self.__TYPECHILD is CHILD_FLIP:
             return self.__Generate_Child_flip(item)
@@ -109,7 +117,24 @@ class GeneticAlgorithm:
         return new_pull
 
     def __Roulette(self):
-        None
+        new_pull = copy.copy(self.__pull)
+        for i in (range(1, self.__rangechild)):
+            self.__pull[i][1]=self.__pull[i][1]+self.__pull[i-1][1]
+        for i in (range(0, self.__SIZE_PULL)):
+            self.__pull[i][2]=1 - (self.__pull[i][1]/self.__pull[self.__SIZE_PULL-1][1])
+
+        for i in (range(0, self.__rangechild)):
+            selec=random()
+            ant = 0
+            for x in (range(0,self.__SIZE_PULL)):
+                if ant < selec and selec <self.__pull[i][2]:
+                    child = self.__Generate_Child(copy.copy(self.__pull[i][0]))
+                ant=self.__pull[i][2]
+            dest = i + self.__sizeelitism
+            if randint(0, 99) < self.__MUTE:
+                child = self.__mute_individuals(child)
+            new_pull[dest][0] = copy.copy(child)
+        return new_pull
 
     def __Next_Generation(self):
         if self.__SELECTION_TYPE is FILL_NEXT_GENERATION:
