@@ -2,12 +2,14 @@ from __builtin__ import str
 
 from random import *
 import copy
+from time import *
 
 ROULETTE = 1
 FILL_NEXT_GENERATION = 2
 
 CHILD_FLIP = 10
 CHILD_SPLIT = 11
+
 
 class B(Exception):
     pass
@@ -16,8 +18,9 @@ class B(Exception):
 class GenecticException(B):
     what = None
 
-class chormosoma_t():
-    def __init__(self,n_chromosomes,maxvalue = None,minvalue = 0,chromosomes_is_float = False,):
+
+class chromosome_t():
+    def __init__(self, n_chromosomes, maxvalue=None, minvalue=0, chromosomes_is_float=False, ):
         self.N_CHRO = n_chromosomes
         if maxvalue is None:
             self.MAXVALUE = n_chromosomes
@@ -26,11 +29,10 @@ class chormosoma_t():
         self.MINVALUE = minvalue
         self.CHRO_IS_F = chromosomes_is_float
 
+
 class GeneticAlgorithm:
-
-
-    def __init__(self,fun_fitness, chromosomes, itmax = 50, child_type = CHILD_FLIP, selection_type = FILL_NEXT_GENERATION,
-                 High_Low = False, size_pull = 1000, porcent_elitism = 10, porcent_mute = 2, testing=False):
+    def __init__(self, fun_fitness, chromosomes, itmax=50, child_type=CHILD_FLIP, selection_type=FILL_NEXT_GENERATION,
+                 High_Low=False, size_pool=1000, porcent_elitism=10, porcent_mute=2, testing=False):
 
         if selection_type not in [ROULETTE, FILL_NEXT_GENERATION]:
             a = GenecticException
@@ -52,28 +54,29 @@ class GeneticAlgorithm:
         self.__MUTE = porcent_mute
         self.__REVERSE = High_Low
         self.__SELECTION_TYPE = selection_type
-        self.__SIZE_PULL = size_pull
+        self.__SIZE_POOL = size_pool
         self.__N_CHROMOSOMES = chromosomes.N_CHRO
         self.__FUN_FITNESS = fun_fitness
         self.__ITMAX = itmax
         self.__TYPECHILD = child_type
-        self.__rangechild = (int)(self.__SIZE_PULL - self.__SIZE_PULL * self.__ELITISM)
-        self.__sizeelitism = (int)(self.__SIZE_PULL * self.__ELITISM)
+        self.__rangechild = (int)(self.__SIZE_POOL - self.__SIZE_POOL * self.__ELITISM)
+        self.__sizeelitism = (int)(self.__SIZE_POOL * self.__ELITISM)
         self.__CHRO_IS_F = chromosomes.CHRO_IS_F
         self.__CHRO_MAXVALUE = chromosomes.MAXVALUE
         self.__CHRO_MINVALUE = chromosomes.MINVALUE
-        self.__pull = self.__Generate_pull()
+        self.__POOL = self.__Generate_pool()
         self.__TEST_POOL = testing  # Flag for testing purpose
 
-        
-    def __Generate_pull(self):
+    def __Generate_pool(self):
         if self.__CHRO_IS_F is False:
             ind = range(self.__CHRO_MINVALUE, self.__CHRO_MAXVALUE)
-            new_pull = [[sample(ind,self.__N_CHROMOSOMES), 0, 0] for y in range(self.__SIZE_PULL)]
-            return new_pull
+            new_pool = [[sample(ind, self.__N_CHROMOSOMES), 0, 0] for y in range(self.__SIZE_POOL)]
+            return new_pool
         else:
-            new_pull = [[[uniform(self.__CHRO_MINVALUE,self.__CHRO_MAXVALUE) for x in range(self.__N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_PULL)]
-            return new_pull
+            new_pool = [
+                [[uniform(self.__CHRO_MINVALUE, self.__CHRO_MAXVALUE) for x in range(self.__N_CHROMOSOMES)], 0, 0] for y
+                in range(self.__SIZE_POOL)]
+            return new_pool
 
     def __getKey(self, item):
         return item[1]
@@ -81,19 +84,19 @@ class GeneticAlgorithm:
     def __Get_Individuos(self, individual):
         if individual not in range(0, self.__SIZE_POOL):
             a = GenecticException
-            a.what = "Error: individual",individual," not existing, 0 < = individual < " + str(self.__SIZE_PULL)
+            a.what = "Error: individual", individual, " not existing, 0 < = individual < " + str(self.__SIZE_POOL)
             raise a
-        return copy.copy(self.__pull[individual][0])
+        return copy.copy(self.__POOL[individual][0])
 
     def __Set_Fittnes(self, individual, Fittnes):
-        if individual not in range(0, self.__SIZE_PULL):
+        if individual not in range(0, self.__SIZE_POOL):
             a = GenecticException
-            a.what = "Error: individual",individual," not existing, 0 < = individual < " + str(self.__SIZE_PULL)
+            a.what = "Error: individual", individual, " not existing, 0 < = individual < " + str(self.__SIZE_POOL)
             raise a
-        self.__pull[individual][1] = Fittnes
+        self.__POOL[individual][1] = Fittnes
 
-    def __sort_pull(self, rever = False):
-        self.__pull.sort(key = self.__getKey, reverse = rever)
+    def __sort_pool(self, rever=False):
+        self.__POOL.sort(key=self.__getKey, reverse=rever)
 
     def __Generate_Child_flip(self, item):
         child = copy.copy(item)
@@ -123,16 +126,16 @@ class GeneticAlgorithm:
         listIndividual = [item, child, child2]
         return self.__Tournament_Selection_Deterministic(listIndividual)
 
-
-    def __Generate_Child_split(self, item1,item2):
+    def __Generate_Child_split(self, item1, item2):
         child1 = copy.copy(item1)
         child2 = copy.copy(item2)
         split = randint(1, self.__N_CHROMOSOMES - 1)
-        child1[0:split] = copy.copy(child2[0:split])                          #[item1[::split],item2[split::]]
-        child2[split:self.__N_CHROMOSOMES] = copy.copy(item1[split:self.__N_CHROMOSOMES])         #[item2[::split],item1[split::]]
-        return self.__Replace_repeated(child1,child2,split)
+        child1[0:split] = copy.copy(child2[0:split])  # [item1[::split],item2[split::]]
+        child2[split:self.__N_CHROMOSOMES] = copy.copy(
+            item1[split:self.__N_CHROMOSOMES])  # [item2[::split],item1[split::]]
+        return self.__Replace_repeated(child1, child2, split)
 
-    def __Replace_repeated(self,child1,child2,split):
+    def __Replace_repeated(self, child1, child2, split):
         for i in range(0, split):
             if child1[i] in child1[split:self.__N_CHROMOSOMES]:
                 for j in range(0, split):
@@ -141,28 +144,28 @@ class GeneticAlgorithm:
                         child1[i] = child2[j]
                         child2[j] = c1
                         break
-        return [child1,child2]
+        return [child1, child2]
 
-    def __Generate_Child(self, item1,item2 = None):
+    def __Generate_Child(self, item1, item2=None):
         if self.__TYPECHILD is CHILD_FLIP:
             return self.__Generate_Child_flip(item1)
         elif self.__TYPECHILD is CHILD_SPLIT:
-            return self.__Generate_Child_split(item1,item2)
+            return self.__Generate_Child_split(item1, item2)
 
     def __Fill_Next_Generation(self):
-        new_pull = copy.copy(self.__pull)
+        new_pull = copy.copy(self.__POOL)
         if self.__TYPECHILD is CHILD_FLIP:
             for i in (range(0, self.__rangechild)):
-                child = self.__Generate_Child(copy.copy(self.__pull[i][0]))
+                child = self.__Generate_Child(copy.copy(self.__POOL[i][0]))
                 dest = i + self.__sizeelitism
                 if randint(0, 99) < self.__MUTE:
                     child = self.__mute_individuals(child)
                 new_pull[dest][0] = copy.copy(child)
         elif self.__TYPECHILD is CHILD_SPLIT:
-            for i in (range(0, self.__rangechild,2)):
-                childs = self.__Generate_Child(copy.copy(self.__pull[i][0]),item2 = copy.copy(self.__pull[i+1][0]))
+            for i in (range(0, self.__rangechild, 2)):
+                childs = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2=copy.copy(self.__POOL[i + 1][0]))
                 dest1 = i + self.__sizeelitism
-                dest2 = dest1+1
+                dest2 = dest1 + 1
                 if randint(0, 99) < self.__MUTE:
                     childs[0] = self.__mute_individuals(childs[0])
                 if randint(0, 99) < self.__MUTE:
@@ -189,53 +192,44 @@ class GeneticAlgorithm:
     def __Tournament_Selection_Probabilistic(self, listItems):
         return listItems[randint(0, len(listItems) - 1)]
 
-    """
-        Asign a predefined pool and activate testing mode
-    """
-
-    def setPool(self, new_Pool):
-        self.__TEST_POOL = True
-        for i in range(0, self.__SIZE_POOL):
-            self.__POOL[i][0] = copy.copy(new_Pool[i])
-
     def __Roulette(self):
-        new_pull = copy.copy(self.__pull)
-        for i in (range(1, self.__SIZE_PULL)):
-            self.__pull[i][1] = self.__pull[i][1]+self.__pull[i-1][1]
-        for i in (range(0, self.__SIZE_PULL)):
-            self.__pull[i][2] = 1 - (self.__pull[i][1]/self.__pull[self.__SIZE_PULL-1][1])
+        new_pool = copy.copy(self.__POOL)
+        for i in (range(1, self.__SIZE_POOL)):
+            self.__POOL[i][1] = self.__POOL[i][1] + self.__POOL[i - 1][1]
+        for i in (range(0, self.__SIZE_POOL)):
+            self.__POOL[i][2] = 1 - (self.__POOL[i][1] / self.__POOL[self.__SIZE_POOL - 1][1])
 
         if self.__TYPECHILD is CHILD_FLIP:
             for i in (range(0, self.__rangechild)):
                 selec = random()
-                for j in range(0,self.__SIZE_PULL)[::-1]:
-                    if selec <self.__pull[j][2]:
+                for j in range(0, self.__SIZE_POOL)[::-1]:
+                    if selec < self.__POOL[j][2]:
                         break
-                child = self.__Generate_Child(copy.copy(self.__pull[j][0]))
+                child = self.__Generate_Child(copy.copy(self.__POOL[j][0]))
                 dest = i + self.__sizeelitism
                 if randint(0, 99) < self.__MUTE:
                     child = self.__mute_individuals(child)
-                new_pull[dest][0] = copy.copy(child)
+                new_pool[dest][0] = copy.copy(child)
         elif self.__TYPECHILD is CHILD_SPLIT:
-            for i in (range(0, self.__rangechild,2)):
+            for i in (range(0, self.__rangechild, 2)):
                 selec1 = random()
                 selec2 = random()
-                for j in range(0, self.__SIZE_PULL)[::-1]:
-                    if selec1 < self.__pull[j][2]:
+                for j in range(0, self.__SIZE_POOL)[::-1]:
+                    if selec1 < self.__POOL[j][2]:
                         break
-                for k in range(0, self.__SIZE_PULL)[::-1]:
-                    if selec2 < self.__pull[k][2]:
+                for k in range(0, self.__SIZE_POOL)[::-1]:
+                    if selec2 < self.__POOL[k][2]:
                         break
-                childs = self.__Generate_Child(copy.copy(self.__pull[j][0]),copy.copy(self.__pull[k][0]))
+                childs = self.__Generate_Child(copy.copy(self.__POOL[j][0]), copy.copy(self.__POOL[k][0]))
                 dest1 = i + self.__sizeelitism
-                dest2 = dest1+1
+                dest2 = dest1 + 1
                 if randint(0, 99) < self.__MUTE:
                     childs[0] = self.__mute_individuals(childs[0])
                 if randint(0, 99) < self.__MUTE:
                     childs[1] = self.__mute_individuals(childs[1])
-                new_pull[dest1][0] = copy.copy(childs[0])
-                new_pull[dest2][0] = copy.copy(childs[1])
-        return new_pull
+                new_pool[dest1][0] = copy.copy(childs[0])
+                new_pool[dest2][0] = copy.copy(childs[1])
+        return new_pool
 
     def __Next_Generation(self):
         if self.__SELECTION_TYPE is FILL_NEXT_GENERATION:
@@ -254,43 +248,46 @@ class GeneticAlgorithm:
     def __mute_individuals_simple(self, item):
         return sample(item, self.__N_CHROMOSOMES)
 
-	# TODO - DEPRECATED
-    def set_pull(self, pull):
-        self.__pull = copy.copy(pull)
+    """
+        Asign a predefined pool and activate testing mode
+    """
 
-    def get_empty_pull(self):
-        pull = [[[0 for x in range(self.__N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_PULL)]
-        return pull
+    def set_pool(self, pool):
+        self.__TEST_POOL = True
+        self.__POOL = copy.copy(pool)
 
-    def get_pull(self):
-        return copy.copy(self.__pull)
+    def get_empty_pool(self):
+        pool = [[[0 for x in range(self.__N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_POOL)]
+        return pool
+
+    def get_pool(self):
+        return copy.copy(self.__POOL)
 
     def print_individuals(self):
-        for i in range(0, self.__SIZE_PULL):
-            print self.__pull[i][:], ","
+        for i in range(0, self.__SIZE_POOL):
+            print self.__POOL[i][:], ","
 
     def Winner_Probability(self):
-        return self.__pull[0][:]
+        return self.__POOL[0][:]
 
-    def run(self,print_best=0):
+    def run(self, print_best=0):
         for x in range(self.__ITMAX):
-            for i in range(self.__SIZE_PULL):
+            for i in range(self.__SIZE_POOL):
                 item = self.__Get_Individuos(i)
                 self.__Set_Fittnes(i, self.__FUN_FITNESS(item))
-            self.__sort_pull(self.__REVERSE)
+            self.__sort_pool(self.__REVERSE)
             print "\rThe winer is: ", self.Winner_Probability()[1],
             if print_best is not 0:
                 print "\rThe winer is: ", self.Winner_Probability()[1]
-                for x in range(0,print_best):
-                    print self.__pull[x][0]
+                for x in range(0, print_best):
+                    print self.__POOL[x][0]
                 sleep(1)
                 print ("\n" * 100)
-            else :
+            else:
                 print "\rThe winer is: ", self.Winner_Probability()[1],
             self.__Next_Generation()
 
-
-        print "\rThe winer is: ",self.Winner_Probability()
+        print "\rThe winer is: ", self.Winner_Probability()
 
     def help(self):
         s = """GeneticAlgorithm
@@ -304,6 +301,3 @@ class GeneticAlgorithm:
 
 
         """
-
-
-

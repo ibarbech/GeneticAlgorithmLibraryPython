@@ -122,13 +122,10 @@ def fitnnes(item):
 
 if __name__ == "__main__":
     f=fitnnes
-    chro=chormosoma_t(N_CHROMOSOMES)
+    chro=chromosome_t(N_CHROMOSOMES)
     try:
         GA=GeneticAlgorithm(f, chro, itmax=ITMAX, selection_type=SELECTION_TYPE,
-                            High_Low=HIGH_LOW, size_pull=SIZE_PULL, child_type=TYPECHILD, porcent_elitism=ELITISM, porcent_mute=MUTE)
-    except GenecticException:
-        print GenecticException.what
-    try:
+                            High_Low=HIGH_LOW, size_pool=SIZE_PULL, child_type=TYPECHILD, porcent_elitism=ELITISM, porcent_mute=MUTE)
         GA.run()
     except GenecticException:
         print GenecticException.what
