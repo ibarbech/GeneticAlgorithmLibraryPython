@@ -207,7 +207,7 @@ class GeneticAlgorithm:
         for i in (range(0, self.__SIZE_POOL)):
             self.__POOL[i][2] = 1 - (self.__POOL[i][1] / self.__POOL[self.__SIZE_POOL - 1][1])
 
-        if self.__TYPECHILD is CHILD_FLIP:
+        if self.__TYPECHILD in [CHILD_FLIP,CHILD_FLIP2]:
             for i in (range(0, self.__rangechild)):
                 selec = random()
                 for j in range(0, self.__SIZE_POOL)[::-1]:
@@ -218,7 +218,7 @@ class GeneticAlgorithm:
                 if randint(0, 99) < self.__MUTE:
                     child = self.__mute_individuals(child)
                 new_pool[dest][0] = copy.copy(child)
-        elif self.__TYPECHILD is CHILD_SPLIT:
+        elif self.__TYPECHILD in [CHILD_SPLIT]:
             for i in (range(0, self.__rangechild, 2)):
                 selec1 = random()
                 selec2 = random()
