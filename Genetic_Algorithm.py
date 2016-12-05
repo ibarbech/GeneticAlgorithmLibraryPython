@@ -3,6 +3,7 @@ from __builtin__ import str
 from random import *
 import copy
 from time import *
+import math
 
 ROULETTE = 1
 FILL_NEXT_GENERATION = 2
@@ -10,7 +11,7 @@ FILL_NEXT_GENERATION = 2
 CHILD_FLIP = 10
 CHILD_SPLIT = 11
 CHILD_FLIP2 = 12
-
+CHILD_MEAN = 13
 
 
 
@@ -146,6 +147,26 @@ class GeneticAlgorithm:
         else:
             return [child1,child2]
 
+    def __Generate_Child_Mean(self, item1, item2):
+        child = copy.copy(item1)
+        if self.__CHRO_IS_F is True:
+            for i in range(self.__N_CHROMOSOMES):
+                child[i] = (item1[i]+item2[1])/2
+        else:
+            for i in range(self.__N_CHROMOSOMES):
+                f = (item1[i] + item2[i])/2
+                child[i] = int(math.floor(f))
+        if self.__CAN_REPETEAD_CHRO is False:
+            n=self.__CHRO_MINVALUE
+            for i in range(self.__N_CHROMOSOMES):
+                if child[i] in child [i+1:]:
+                    while(True):
+                        if n not in child:
+                            child[i]=n
+                            break
+                        n+=1
+        return child
+
     def __Replace_repeated(self, child1, child2, split):
         for i in range(0, split):
             if child1[i] in child1[split:self.__N_CHROMOSOMES]:
@@ -164,12 +185,14 @@ class GeneticAlgorithm:
             return self.__Generate_Child_tournament_Det(item1)
         elif self.__TYPECHILD is CHILD_SPLIT:
             return self.__Generate_Child_split(item1, item2)
+        elif self.__TYPECHILD is CHILD_MEAN:
+            return self.__Generate_Child_Mean(item1, item2)
 
     def __Fill_Next_Generation(self):
         new_pull = copy.copy(self.__POOL)
-        if self.__TYPECHILD in [CHILD_FLIP,CHILD_FLIP2]:
+        if self.__TYPECHILD in [CHILD_FLIP, CHILD_FLIP2, CHILD_MEAN]:
             for i in (range(0, self.__rangechild)):
-                child = self.__Generate_Child(copy.copy(self.__POOL[i][0]))
+                child = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2 = self.__POOL[i+1][0])
                 dest = i + self.__sizeelitism
                 if randint(0, 99) < self.__MUTE:
                     child = self.__mute_individuals(child)
@@ -209,13 +232,13 @@ class GeneticAlgorithm:
         for i in (range(0, self.__SIZE_POOL)):
             self.__POOL[i][2] = 1 - (self.__POOL[i][1] / self.__POOL[self.__SIZE_POOL - 1][1])
 
-        if self.__TYPECHILD in [CHILD_FLIP,CHILD_FLIP2]:
+        if self.__TYPECHILD in [CHILD_FLIP, CHILD_FLIP2, CHILD_MEAN]:
             for i in (range(0, self.__rangechild)):
                 selec = random()
                 for j in range(0, self.__SIZE_POOL)[::-1]:
                     if selec < self.__POOL[j][2]:
                         break
-                child = self.__Generate_Child(copy.copy(self.__POOL[j][0]))
+                child = self.__Generate_Child(copy.copy(self.__POOL[j][0]),copy.copy(self.__POOL[j+1][0]))
                 dest = i + self.__sizeelitism
                 if randint(0, 99) < self.__MUTE:
                     child = self.__mute_individuals(child)
@@ -331,5 +354,15 @@ class GeneticAlgorithm:
                 child2[2, 7, 6, 1, 6, 8, 2, 1, 5, 7, 8, 3, 6]
                       [r_father_1][   father_2  ][r_father_3]
                 return the best [father, child1, child2]
+
+            CHILD_MEAN and chromosomes_is_float = True
+                father1 [1, 5, 7, 6]
+                father2 [3, 8, 1, 3]
+                child   [2, 6.5, 4, 4.5]  child[i] = (father1[i]+father2[i])/2
+
+            CHILD_MEAN and chromosomes_is_float = False
+                father1 [1, 5, 7, 6]
+                father2 [3, 8, 1, 3]
+                child   [2, 6, 4, 4]  child[i] = floor((father1[i]+father2[i])/2)
         """
         print s
