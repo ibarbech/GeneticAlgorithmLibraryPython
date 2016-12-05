@@ -31,8 +31,9 @@ class chromosome_t():
 
 
 class GeneticAlgorithm:
+
     def __init__(self, fun_fitness, chromosomes, itmax=50, child_type=CHILD_FLIP, selection_type=FILL_NEXT_GENERATION,
-                 High_Low=False, size_pool=1000, porcent_elitism=10, porcent_mute=2, testing=False):
+                 High_Low=False, size_pool=1000, porcent_elitism=10, porcent_mute=2, can_repeated_chro=False, testing=False):
 
         if selection_type not in [ROULETTE, FILL_NEXT_GENERATION]:
             a = GenecticException
@@ -64,13 +65,17 @@ class GeneticAlgorithm:
         self.__CHRO_IS_F = chromosomes.CHRO_IS_F
         self.__CHRO_MAXVALUE = chromosomes.MAXVALUE
         self.__CHRO_MINVALUE = chromosomes.MINVALUE
+        self.__CAN_REPETEAD_CHRO = can_repeated_chro
         self.__POOL = self.__Generate_pool()
         self.__TEST_POOL = testing  # Flag for testing purpose
 
     def __Generate_pool(self):
         if self.__CHRO_IS_F is False:
-            ind = range(self.__CHRO_MINVALUE, self.__CHRO_MAXVALUE)
-            new_pool = [[sample(ind, self.__N_CHROMOSOMES), 0, 0] for y in range(self.__SIZE_POOL)]
+            if self.__CAN_REPETEAD_CHRO is False:
+                ind = range(self.__CHRO_MINVALUE, self.__CHRO_MAXVALUE)
+                new_pool = [[sample(ind, self.__N_CHROMOSOMES), 0, 0] for y in range(self.__SIZE_POOL)]
+            else:
+                new_pool = [[[randint(self.__CHRO_MINVALUE,self.__CHRO_MAXVALUE)for x in range(self.__N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_POOL)]
             return new_pool
         else:
             new_pool = [
@@ -133,7 +138,10 @@ class GeneticAlgorithm:
         child1[0:split] = copy.copy(child2[0:split])  # [item1[::split],item2[split::]]
         child2[split:self.__N_CHROMOSOMES] = copy.copy(
             item1[split:self.__N_CHROMOSOMES])  # [item2[::split],item1[split::]]
-        return self.__Replace_repeated(child1, child2, split)
+        if self.__CAN_REPETEAD_CHRO is False:
+            return self.__Replace_repeated(child1, child2, split)
+        else:
+            return [child1,child2]
 
     def __Replace_repeated(self, child1, child2, split):
         for i in range(0, split):
@@ -164,14 +172,11 @@ class GeneticAlgorithm:
         elif self.__TYPECHILD is CHILD_SPLIT:
             for i in (range(0, self.__rangechild, 2)):
                 childs = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2=copy.copy(self.__POOL[i + 1][0]))
-                dest1 = i + self.__sizeelitism
-                dest2 = dest1 + 1
-                if randint(0, 99) < self.__MUTE:
-                    childs[0] = self.__mute_individuals(childs[0])
-                if randint(0, 99) < self.__MUTE:
-                    childs[1] = self.__mute_individuals(childs[1])
-                new_pull[dest1][0] = copy.copy(childs[0])
-                new_pull[dest2][0] = copy.copy(childs[1])
+                dest = i + self.__sizeelitism
+                for j in [0,1]:
+                    if randint(0, 99) < self.__MUTE:
+                        childs[j] = self.__mute_individuals(childs[j])
+                    new_pull[dest+j][0] = copy.copy(childs[j])
         return new_pull
 
     """
@@ -221,14 +226,11 @@ class GeneticAlgorithm:
                     if selec2 < self.__POOL[k][2]:
                         break
                 childs = self.__Generate_Child(copy.copy(self.__POOL[j][0]), copy.copy(self.__POOL[k][0]))
-                dest1 = i + self.__sizeelitism
-                dest2 = dest1 + 1
-                if randint(0, 99) < self.__MUTE:
-                    childs[0] = self.__mute_individuals(childs[0])
-                if randint(0, 99) < self.__MUTE:
-                    childs[1] = self.__mute_individuals(childs[1])
-                new_pool[dest1][0] = copy.copy(childs[0])
-                new_pool[dest2][0] = copy.copy(childs[1])
+                dest = i + self.__sizeelitism
+                for j in [0,1]:
+                    if randint(0, 99) < self.__MUTE:
+                        childs[j] = self.__mute_individuals(childs[j])
+                    new_pool[dest+j][0] = copy.copy(childs[j])
         return new_pool
 
     def __Next_Generation(self):
@@ -245,8 +247,10 @@ class GeneticAlgorithm:
         b[index[0]:index[1]] = copy.copy(sample(a, index[1] - index[0]))
         return b
 
+    """
     def __mute_individuals_simple(self, item):
         return sample(item, self.__N_CHROMOSOMES)
+    """
 
     """
         Asign a predefined pool and activate testing mode
@@ -297,7 +301,22 @@ class GeneticAlgorithm:
         The structure of a individual is:
         [value,value,value,...,value] It has as many values as chromosomes.
 
+        Ways to Generate Children:
 
-
+            CHILD_FLIP
+                father[1, 6, 7, 2, 6, 8, 2, 1, 5, 6, 3, 8, 7]
+                                  [6, 8, 2, 1, 5]
+                child [1, 6, 7, 2, 5, 1, 2, 8, 6 ,6 ,3, 8, 7]
+                                  [5, 1, 2, 8, 6]
+            CHILD_SPLIT
+                father1[1, 6, 7, 2, 6, 8, 2, 1, 5, 6, 3, 8, 7]
+                       [   father1_1    ][     father1_2     ]
+                father1[5, 4, 8, 6, 3, 2, 8, 6, 5, 7, 9, 3, 7]
+                       [   father2_1    ][     father2_2     ]
+                child1 [1, 6, 7, 2, 6, 8, 8, 6, 5, 7, 9, 3, 7]
+                       [   father1_1    ][     father2_2     ]
+                child2 [5, 4, 8, 6, 3, 2, 2, 1, 5, 6, 3, 8, 7]
+                       [   father2_1    ][     father1_2     ]
 
         """
+        print s

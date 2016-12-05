@@ -126,6 +126,7 @@ if __name__ == "__main__":
     try:
         GA=GeneticAlgorithm(f, chro, itmax=ITMAX, selection_type=SELECTION_TYPE,
                             High_Low=HIGH_LOW, size_pool=SIZE_PULL, child_type=TYPECHILD, porcent_elitism=ELITISM, porcent_mute=MUTE)
+        GA.help()
         GA.run()
     except GenecticException:
         print GenecticException.what
