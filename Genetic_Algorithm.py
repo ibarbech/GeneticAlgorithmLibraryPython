@@ -35,51 +35,63 @@ class chromosome_t():
 
 
 class GeneticAlgorithm:
-    """GeneticAlgorithm
-        The structure of a tuple of the PULL is:
-        [individual, FITNNES, PROBABILITY FOR THE ROULETTE]
+    """
+The structure of a tuple of the PULL is:
+[individual, FITNNES, PROBABILITY FOR THE ROULETTE]
 
-        The structure of a individual is:
-        [value,value,value,...,value] It has as many values as chromosomes.
+The structure of a individual is:
+[value,value,value,...,value] It has as many values as chromosomes.
 
-        Ways to Generate Children:
+Ways to Generate Children:
 
-            CHILD_FLIP
-                father[1, 6, 7, 2, 6, 8, 2, 1, 5, 6, 3, 8, 7]
-                                  [    father   ]
-                child [1, 6, 7, 2, 5, 1, 2, 8, 6 ,6 ,3, 8, 7]
-                                  [   r_father  ]
-            CHILD_SPLIT
-                father1[1, 6, 7, 2, 6, 8, 2, 1, 5, 6, 3, 8, 7]
-                       [   father1_1    ][     father1_2     ]
-                father1[5, 4, 8, 6, 3, 2, 8, 6, 5, 7, 9, 3, 7]
-                       [   father2_1    ][     father2_2     ]
-                child1 [1, 6, 7, 2, 6, 8, 8, 6, 5, 7, 9, 3, 7]
-                       [   father1_1    ][     father2_2     ]
-                child2 [5, 4, 8, 6, 3, 2, 2, 1, 5, 6, 3, 8, 7]
-                       [   father2_1    ][     father1_2     ]
+    fatherx [1, 2, 3]  -->  r_fatherx [3, 2, 1]
 
-            CHILD_FLIP2
-                father[1, 6, 7, 2, 6, 8, 2, 1, 5, 6, 3, 8, 7]
-                      [ father_1 ][   father_2  ][ father_3 ]
-                child1[1, 6, 7, 2, 5, 1, 2, 8, 6 ,6 ,3, 8, 7]
-                      [ father_1 ][  r_father_2 ][ father_3 ]
-                child2[2, 7, 6, 1, 6, 8, 2, 1, 5, 7, 8, 3, 6]
-                      [r_father_1][   father_2  ][r_father_3]
-                return the best [father, child1, child2]
+    CHILD_FLIP
+        father[1, 6, 7, 2, 6, 8, 2, 1, 5, 6, 3, 8, 7]
+                          [    father   ]
 
-            CHILD_MEAN and chromosomes_is_float = True
-                father1 [1, 5, 7, 6]
-                father2 [3, 8, 1, 3]
-                child   [2, 6.5, 4, 4.5]  child[i] = (father1[i]+father2[i])/2
+        child [1, 6, 7, 2, 5, 1, 2, 8, 6 ,6 ,3, 8, 7]
+                          [   r_father  ]
+    CHILD_SPLIT
+        father1[1, 6, 7, 2, 6, 8, 2, 1, 5, 6, 3, 8, 7]
+               [   father1_1    ][     father1_2     ]
 
-            CHILD_MEAN and chromosomes_is_float = False
-                father1 [1, 5, 7, 6]
-                father2 [3, 8, 1, 3]
-                child   [2, 6, 4, 4]  child[i] = floor((father1[i]+father2[i])/2)
+        father1[5, 4, 8, 6, 3, 2, 8, 6, 5, 7, 9, 3, 7]
+               [   father2_1    ][     father2_2     ]
 
-        Example:
-        This is the typical travelling salesman problem (TSP) in this case there are 20 cities.
+        child1 [1, 6, 7, 2, 6, 8, 8, 6, 5, 7, 9, 3, 7]
+               [   father1_1    ][     father2_2     ]
+
+        child2 [5, 4, 8, 6, 3, 2, 2, 1, 5, 6, 3, 8, 7]
+               [   father2_1    ][     father1_2     ]
+
+    CHILD_FLIP2
+        father[1, 6, 7, 2, 6, 8, 2, 1, 5, 6, 3, 8, 7]
+              [ father_1 ][   father_2  ][ father_3 ]
+
+        child1[1, 6, 7, 2, 5, 1, 2, 8, 6 ,6 ,3, 8, 7]
+              [ father_1 ][  r_father_2 ][ father_3 ]
+
+        child2[2, 7, 6, 1, 6, 8, 2, 1, 5, 7, 8, 3, 6]
+              [r_father_1][   father_2  ][r_father_3]
+        return the best [father, child1, child2]
+
+    CHILD_MEAN and chromosomes_is_float = True
+        father1 [1, 5, 7, 6]
+
+        father2 [3, 8, 1, 3]
+
+        child   [2, 6.5, 4, 4.5]  child[i] = (father1[i]+father2[i])/2
+
+    CHILD_MEAN and chromosomes_is_float = False
+        father1 [1, 5, 7, 6]
+
+        father2 [3, 8, 1, 3]
+
+        child   [2, 6, 4, 4]  child[i] = floor((father1[i]+father2[i])/2)
+
+Example:
+This is the typical travelling salesman problem (TSP) in this case there are 20 cities.
 
 from Genetic_Algorithm import *
 
