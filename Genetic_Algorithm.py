@@ -12,6 +12,8 @@ CHILD_SPLIT = 11
 CHILD_FLIP2 = 12
 
 
+
+
 class B(Exception):
     pass
 
@@ -21,7 +23,7 @@ class GenecticException(B):
 
 
 class chromosome_t():
-    def __init__(self, n_chromosomes, maxvalue=None, minvalue=0, chromosomes_is_float=False, ):
+    def __init__(self, n_chromosomes, maxvalue = None, minvalue = 0, chromosomes_is_float = False, ):
         self.N_CHRO = n_chromosomes
         if maxvalue is None:
             self.MAXVALUE = n_chromosomes
@@ -33,8 +35,8 @@ class chromosome_t():
 
 class GeneticAlgorithm:
 
-    def __init__(self, fun_fitness, chromosomes, itmax=50, child_type=CHILD_FLIP, selection_type=FILL_NEXT_GENERATION,
-                 High_Low=False, size_pool=1000, porcent_elitism=10, porcent_mute=2, can_repeated_chro=False, testing=False):
+    def __init__(self, fun_fitness, chromosomes, itmax = 50, child_type = CHILD_FLIP, selection_type = FILL_NEXT_GENERATION,
+                 High_Low = False, size_pool = 1000, porcent_elitism = 10, porcent_mute = 2, can_repeated_chro = False, testing = False):
 
         if selection_type not in [ROULETTE, FILL_NEXT_GENERATION]:
             a = GenecticException
@@ -101,8 +103,8 @@ class GeneticAlgorithm:
             raise a
         self.__POOL[individual][1] = Fittnes
 
-    def __sort_pool(self, rever=False):
-        self.__POOL.sort(key=self.__getKey, reverse=rever)
+    def __sort_pool(self, rever = False):
+        self.__POOL.sort(key = self.__getKey, reverse = rever)
 
     def __Generate_Child_flip(self, item):
         child = copy.copy(item)
@@ -155,7 +157,7 @@ class GeneticAlgorithm:
                         break
         return [child1, child2]
 
-    def __Generate_Child(self, item1, item2=None):
+    def __Generate_Child(self, item1, item2 = None):
         if self.__TYPECHILD is CHILD_FLIP:
             return self.__Generate_Child_flip(item1)
         elif self.__TYPECHILD is CHILD_FLIP2:
@@ -174,7 +176,7 @@ class GeneticAlgorithm:
                 new_pull[dest][0] = copy.copy(child)
         elif self.__TYPECHILD in [CHILD_SPLIT]:
             for i in (range(0, self.__rangechild, 2)):
-                childs = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2=copy.copy(self.__POOL[i + 1][0]))
+                childs = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2 = copy.copy(self.__POOL[i + 1][0]))
                 dest = i + self.__sizeelitism
                 for j in [0,1]:
                     if randint(0, 99) < self.__MUTE:
@@ -191,7 +193,7 @@ class GeneticAlgorithm:
         dict = {}
         for i in range(0, len(listItems)):
             dict[i] = self.__FUN_FITNESS(listItems[i])
-        return listItems[sorted(dict, reverse=True)[0]]
+        return listItems[sorted(dict, reverse = True)[0]]
 
     """
         Function that select the best item from a list of items for tournament selection.
@@ -277,7 +279,7 @@ class GeneticAlgorithm:
     def Winner_Probability(self):
         return self.__POOL[0][:]
 
-    def run(self, print_best=0):
+    def run(self, print_best = 0):
         for x in range(self.__ITMAX):
             for i in range(self.__SIZE_POOL):
                 item = self.__Get_Individuos(i)
@@ -308,9 +310,9 @@ class GeneticAlgorithm:
 
             CHILD_FLIP
                 father[1, 6, 7, 2, 6, 8, 2, 1, 5, 6, 3, 8, 7]
-                                  [6, 8, 2, 1, 5]
+                                  [    father   ]
                 child [1, 6, 7, 2, 5, 1, 2, 8, 6 ,6 ,3, 8, 7]
-                                  [5, 1, 2, 8, 6]
+                                  [   r_father  ]
             CHILD_SPLIT
                 father1[1, 6, 7, 2, 6, 8, 2, 1, 5, 6, 3, 8, 7]
                        [   father1_1    ][     father1_2     ]
