@@ -9,6 +9,7 @@ FILL_NEXT_GENERATION = 2
 
 CHILD_FLIP = 10
 CHILD_SPLIT = 11
+CHILD_FLIP2 = 12
 
 
 class B(Exception):
@@ -157,19 +158,21 @@ class GeneticAlgorithm:
     def __Generate_Child(self, item1, item2=None):
         if self.__TYPECHILD is CHILD_FLIP:
             return self.__Generate_Child_flip(item1)
+        elif self.__TYPECHILD is CHILD_FLIP2:
+            return self.__Generate_Child_tournament_Det(item1)
         elif self.__TYPECHILD is CHILD_SPLIT:
             return self.__Generate_Child_split(item1, item2)
 
     def __Fill_Next_Generation(self):
         new_pull = copy.copy(self.__POOL)
-        if self.__TYPECHILD is CHILD_FLIP:
+        if self.__TYPECHILD in [CHILD_FLIP,CHILD_FLIP2]:
             for i in (range(0, self.__rangechild)):
                 child = self.__Generate_Child(copy.copy(self.__POOL[i][0]))
                 dest = i + self.__sizeelitism
                 if randint(0, 99) < self.__MUTE:
                     child = self.__mute_individuals(child)
                 new_pull[dest][0] = copy.copy(child)
-        elif self.__TYPECHILD is CHILD_SPLIT:
+        elif self.__TYPECHILD in [CHILD_SPLIT]:
             for i in (range(0, self.__rangechild, 2)):
                 childs = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2=copy.copy(self.__POOL[i + 1][0]))
                 dest = i + self.__sizeelitism
@@ -318,5 +321,13 @@ class GeneticAlgorithm:
                 child2 [5, 4, 8, 6, 3, 2, 2, 1, 5, 6, 3, 8, 7]
                        [   father2_1    ][     father1_2     ]
 
+            CHILD_FLIP2
+                father[1, 6, 7, 2, 6, 8, 2, 1, 5, 6, 3, 8, 7]
+                      [ father_1 ][   father_2  ][ father_3 ]
+                child1[1, 6, 7, 2, 5, 1, 2, 8, 6 ,6 ,3, 8, 7]
+                      [ father_1 ][  r_father_2 ][ father_3 ]
+                child2[2, 7, 6, 1, 6, 8, 2, 1, 5, 7, 8, 3, 6]
+                      [r_father_1][   father_2  ][r_father_3]
+                return the best [father, child1, child2]
         """
         print s
