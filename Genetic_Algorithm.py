@@ -4,6 +4,7 @@ from random import *
 import copy
 from time import *
 import math
+from PySide import QtCore
 
 ROULETTE = 1
 FILL_NEXT_GENERATION = 2
@@ -187,6 +188,10 @@ if __name__ ==  "__main__":
         self.__CAN_REPETEAD_CHRO = can_repeated_chro
         self.__POOL = self.__Generate_pool()
         self.__TEST_POOL = testing  # Flag for testing purpose
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.__run)
+        self.timer.start(500)
+
 
     """
         Function that generate a pool
@@ -492,7 +497,8 @@ if __name__ ==  "__main__":
         Function main that run the algorithm
     """
 
-    def run(self, print_best = 0):
+
+    def run(self, print_best=0):
         for x in range(self.__ITMAX):
             for i in range(self.__SIZE_POOL):
                 item = self.__Get_Individuos(i)
@@ -511,6 +517,14 @@ if __name__ ==  "__main__":
 
         print "\rThe winer is: ", self.Winner_Probability()
 
+    @QtCore.Slot()
+    def __run(self):
+        for i in range(self.__SIZE_POOL):
+            item = self.__Get_Individuos(i)
+            self.__Set_Fittnes(i, self.__FUN_FITNESS(item))
+        self.__sort_pool(self.__REVERSE)
+        print "\rThe winer is: ", self.Winner_Probability()[1],
+        self.__Next_Generation()
     def help(self):
         s = """GeneticAlgorithm
         The structure of a tuple of the PULL is:
