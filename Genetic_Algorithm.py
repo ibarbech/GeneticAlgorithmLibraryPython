@@ -633,3 +633,6 @@ if __name__ ==  "__main__":
 
     def start(self,period=500):
         self.timer.start(period)
+
+    def stop(self):
+        self.timer.stop()

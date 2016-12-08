@@ -1,5 +1,5 @@
 
-from PyQt4 import QtCore,QtGui
+from PySide import QtCore,QtGui
 import copy
 
 RED = QtCore.Qt.red
@@ -7,10 +7,9 @@ BLUE = QtCore.Qt.blue
 BLACK = QtCore.Qt.black
 YELLOW = QtCore.Qt.yellow
 GREEN = QtCore.Qt.green
-class GUI(QtGui.QGraphicsView):
+class SCENE(QtGui.QGraphicsScene):
     def __init__(self):
-        QtGui.QGraphicsView.__init__(self)
-        self.__scene = QtGui.QGraphicsScene(self)
+        QtGui.QGraphicsScene.__init__(self)
         self.__N_cities=0
         self.__listCitys=[]
 
@@ -27,7 +26,7 @@ class GUI(QtGui.QGraphicsView):
                     break
             item = QtGui.QGraphicsLineItem(p1[0], p1[1], p2[0], p2[1])
             item.setPen(pen)
-            self.__scene.addItem(item)
+            self.addItem(item)
         p1 = None
         p2 = None
         for x in self.__listCitys:
@@ -39,8 +38,7 @@ class GUI(QtGui.QGraphicsView):
                 break
         item = QtGui.QGraphicsLineItem(p1[0], p1[1], p2[0], p2[1])
         item.setPen(pen)
-        self.__scene.addItem(item)
-        self.setScene(self.__scene)
+        self.addItem(item)
 
     def addCity(self,x,y):
         punto = copy.copy([self.__N_cities, [x, y]])
@@ -49,8 +47,7 @@ class GUI(QtGui.QGraphicsView):
         item=QtGui.QGraphicsEllipseItem(x-2,y-2,4,4)
         label = QtGui.QGraphicsTextItem(QtCore.QString(str(x[0])), item)
         label.moveBy(x[1][0], x[1][1])
-        self.__scene.addItem(item)
-        self.setScene(self.__scene)
+        self.addItem(item)
 
     def Paint_road(self,Road1,color,size=1):
         pen=QtGui.QPen()
@@ -61,11 +58,8 @@ class GUI(QtGui.QGraphicsView):
     def RePaint(self):
         for x in self.__listCitys:
             item = QtGui.QGraphicsEllipseItem(x[1][0]-5, x[1][1]-5, 10, 10)
-            label = QtGui.QGraphicsTextItem(QtCore.QString(str(x[0])), item)
-            label.moveBy(x[1][0], x[1][1])
-            self.__scene.addItem(label)
-            self.__scene.addItem(item)
-            self.setScene(self.__scene)
+            self.set_text(str(x[0]),x[1][0], x[1][1])
+            self.addItem(item)
 
     def get_listCities(self):
         return copy.copy(self.__listCitys)
@@ -74,5 +68,10 @@ class GUI(QtGui.QGraphicsView):
         self.__listCitys = copy.copy(listcities)
         self.__N_cities = len(listcities)
 
+    def set_text(self, text, x, y):
+        label = QtGui.QGraphicsTextItem(text)
+        label.moveBy(x, y)
+        self.addItem(label)
+
     def Clear(self):
-        self.__scene.clear()
+        self.clear()

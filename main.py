@@ -1,6 +1,7 @@
 from Genetic_Algorithm import *
-from GUI import *
+from scene import *
 import sys
+from gui import *
 from PySide import QtCore,QtGui
 
 
@@ -140,6 +141,9 @@ distance = [ [ 9.22337203685e+18 , 77.0 , 30.0 , 52.0 , 30.0 , 28.0 , 28.0 , 91.
 [ 60.0 , 32.0 , 26.0 , 96.0 , 30.0 , 99.0 , 91.0 , 81.0 , 40.0 , 93.0 , 38.0 , 72.0 , 45.0 , 48.0 , 28.0 , 51.0 , 41.0 , 81.0 , 52.0 , 50.0 , 74.0 , 52.0 , 75.0 , 87.0 , 44.0 , 33.0 , 90.0 , 22.0 , 99.0 , 94.0 , 76.0 , 39.0 , 92.0 , 88.0 , 88.0 , 57.0 , 44.0 , 87.0 , 52.0 , 44.0 , 76.0 , 86.0 , 87.0 , 74.0 , 53.0 , 44.0 , 48.0 , 54.0 , 50.0 , 33.0 , 66.0 , 52.0 , 45.0 , 45.0 , 97.0 , 58.0 , 55.0 , 56.0 , 56.0 , 37.0 , 90.0 , 50.0 , 35.0 , 94.0 , 59.0 , 27.0 , 31.0 , 93.0 , 98.0 , 74.0 , 55.0 , 97.0 , 30.0 , 85.0 , 66.0 , 83.0 , 68.0 , 93.0 , 61.0 , 29.0 , 61.0 , 21.0 , 25.0 , 32.0 , 91.0 , 98.0 , 38.0 , 22.0 , 35.0 , 79.0 , 41.0 , 68.0 , 45.0 , 64.0 , 20.0 , 89.0 , 27.0 , 63.0 , 9.22337203685e+18 , 57.0 ],
 [ 22.0 , 69.0 , 81.0 , 79.0 , 57.0 , 30.0 , 27.0 , 34.0 , 62.0 , 65.0 , 29.0 , 29.0 , 49.0 , 53.0 , 58.0 , 40.0 , 44.0 , 67.0 , 65.0 , 24.0 , 95.0 , 36.0 , 48.0 , 92.0 , 29.0 , 55.0 , 48.0 , 63.0 , 70.0 , 53.0 , 100.0 , 90.0 , 100.0 , 49.0 , 34.0 , 97.0 , 48.0 , 46.0 , 97.0 , 89.0 , 71.0 , 86.0 , 89.0 , 22.0 , 63.0 , 70.0 , 65.0 , 34.0 , 74.0 , 49.0 , 99.0 , 32.0 , 34.0 , 78.0 , 77.0 , 41.0 , 95.0 , 53.0 , 21.0 , 74.0 , 96.0 , 55.0 , 52.0 , 23.0 , 57.0 , 42.0 , 85.0 , 68.0 , 38.0 , 23.0 , 25.0 , 95.0 , 72.0 , 92.0 , 52.0 , 79.0 , 90.0 , 99.0 , 98.0 , 75.0 , 57.0 , 95.0 , 65.0 , 92.0 , 21.0 , 70.0 , 98.0 , 73.0 , 37.0 , 97.0 , 61.0 , 52.0 , 29.0 , 39.0 , 75.0 , 72.0 , 40.0 , 33.0 , 57.0 , 9.22337203685e+18 ]]#100x100
 distance = dist
+timer=None
+
+
 def fitnnes(item):
     dist = 0
     cityant = item[0]
@@ -152,49 +156,49 @@ def fitnnes(item):
 @QtCore.Slot()
 def update_view():
 
-    winneract__ = GA.Winner_Probability()[0]
-    if winneract__ is not update_view.winneract:
+    winneract__ = GA.Winner_Probability()
+
+    if winneract__[0] is not update_view.winneract:
         update_view.winnerant = update_view.winneract
-        update_view.winneract = winneract__
-    view.Clear()
-    view.RePaint()
-    view.Paint_road(update_view.winneract, RED, 3)
+        update_view.winneract = winneract__[0]
+    scene.Clear()
+    scene.RePaint()
+    scene.set_text(str(winneract__[1]) + " km", -400, -170)
+    scene.Paint_road(update_view.winneract, RED, 3)
     if update_view.winnerant is not None:
-        view.Paint_road(update_view.winnerant, BLACK)
-
-
-
+        scene.Paint_road(update_view.winnerant, BLACK)
 update_view.winnerant = None
 update_view.winneract = None
+
+def start():
+    GA.start(100)
+    timer.start(100)
+def stop():
+    GA.stop()
+    timer.stop()
+
 if __name__ ==  "__main__":
-    f = fitnnes
-    #help(GeneticAlgorithm)
-    chro = chromosome_t(N_CHROMOSOMES)
     app = QtGui.QApplication(sys.argv)
-    view = GUI()
-    view.scale(1.8, 1.8)
-    view.show()
-    view.set_listCities(pcities)
-    view.RePaint()
+    Dialog = QtGui.QDialog()
+    ui = Ui_Dialog()
+    ui.setupUi(Dialog)
+    Dialog.show()
 
+    chro = chromosome_t(N_CHROMOSOMES)
+    scene = SCENE()
+    scene.set_listCities(pcities)
+    scene.RePaint()
+    ui.graphicsView.setScene(scene)
 
+    ui.start.clicked.connect(start)
+    ui.stop.clicked.connect(stop)
+    f = fitnnes
     try:
         GA = GeneticAlgorithm(f, chro, itmax = ITMAX, selection_type = SELECTION_TYPE,
                             High_Low = HIGH_LOW, size_pool = SIZE_PULL, child_type = TYPECHILD, porcent_elitism = ELITISM, porcent_mute = MUTE)
-        GA.start()
         timer = QtCore.QTimer()
         QtCore.QTimer.connect(timer, QtCore.SIGNAL("timeout()"), update_view)
-        timer.start(500)
 
-        """
-        GA.run()
-        while(1):
-            winneract = GA.Winner_Probability()[0]
-            view.Paint_road(winneract,RED)
-            print winneract
-            if winnerant is not None:
-                view.Paint_road(winnerant,BLACK)
-        """
     except GenecticException:
         print GenecticException.what
     sys.exit(app.exec_())
