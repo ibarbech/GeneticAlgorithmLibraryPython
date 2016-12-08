@@ -190,7 +190,6 @@ if __name__ ==  "__main__":
         self.__TEST_POOL = testing  # Flag for testing purpose
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.__run)
-        self.timer.start(500)
 
 
     """
@@ -525,6 +524,7 @@ if __name__ ==  "__main__":
         self.__sort_pool(self.__REVERSE)
         print "\rThe winer is: ", self.Winner_Probability()[1],
         self.__Next_Generation()
+
     def help(self):
         s = """GeneticAlgorithm
         The structure of a tuple of the PULL is:
@@ -630,3 +630,6 @@ if __name__ ==  "__main__":
 
         """
         print s
+
+    def start(self,period=500):
+        self.timer.start(period)

@@ -1,7 +1,7 @@
 from Genetic_Algorithm import *
 from GUI import *
 import sys
-from PySide import QtCore
+from PySide import QtCore,QtGui
 
 
 ELITISM = 10
@@ -151,12 +151,21 @@ def fitnnes(item):
 
 @QtCore.Slot()
 def update_view():
-    winneract = GA.Winner_Probability()[0]
+
+    winneract__ = GA.Winner_Probability()[0]
+    if winneract__ is not update_view.winneract:
+        update_view.winnerant = update_view.winneract
+        update_view.winneract = winneract__
     view.Clear()
     view.RePaint()
-    view.Paint_road(winneract, RED)
+    view.Paint_road(update_view.winneract, RED, 3)
+    if update_view.winnerant is not None:
+        view.Paint_road(update_view.winnerant, BLACK)
 
 
+
+update_view.winnerant = None
+update_view.winneract = None
 if __name__ ==  "__main__":
     f = fitnnes
     #help(GeneticAlgorithm)
@@ -168,15 +177,14 @@ if __name__ ==  "__main__":
     view.set_listCities(pcities)
     view.RePaint()
 
+
     try:
         GA = GeneticAlgorithm(f, chro, itmax = ITMAX, selection_type = SELECTION_TYPE,
                             High_Low = HIGH_LOW, size_pool = SIZE_PULL, child_type = TYPECHILD, porcent_elitism = ELITISM, porcent_mute = MUTE)
+        GA.start()
         timer = QtCore.QTimer()
         QtCore.QTimer.connect(timer, QtCore.SIGNAL("timeout()"), update_view)
         timer.start(500)
-#
- #       timer.timeout.connect(update_view, GA)
-  #      timer.start(500)
 
         """
         GA.run()
