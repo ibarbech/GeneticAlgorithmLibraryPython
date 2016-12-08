@@ -152,9 +152,29 @@ if __name__ ==  "__main__":
 
         """
 
-    def __init__(self, fun_fitness, chromosomes, itmax = 50, child_type = CHILD_FLIP, selection_type = FILL_NEXT_GENERATION,
-                 High_Low = False, size_pool = 1000, porcent_elitism = 10, porcent_mute = 2, can_repeated_chro = False, testing = False):
+    def __init__(self):
+        self.__ELITISM = None
+        self.__MUTE = None
+        self.__REVERSE = None
+        self.__SELECTION_TYPE = None
+        self.__SIZE_POOL = None
+        self.__N_CHROMOSOMES = None
+        self.__FUN_FITNESS = None
+        self.__ITMAX = None
+        self.__TYPECHILD = None
+        self.__rangechild = None
+        self.__sizeelitism = None
+        self.__CHRO_IS_F = None
+        self.__CHRO_MAXVALUE = None
+        self.__CHRO_MINVALUE = None
+        self.__CAN_REPETEAD_CHRO = None
+        self.__POOL = None
+        self.__TEST_POOL = None
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.__run)
 
+    def setattrGeneticAlgorithm(self, fun_fitness, chromosomes, itmax = 50, child_type = CHILD_FLIP, selection_type = FILL_NEXT_GENERATION,
+                 High_Low = False, size_pool = 1000, porcent_elitism = 10, porcent_mute = 2, can_repeated_chro = False, testing = False):
         if selection_type not in [ROULETTE, FILL_NEXT_GENERATION]:
             a = GenecticException
             a.what = "Error: selection_type is not correct."
@@ -187,11 +207,7 @@ if __name__ ==  "__main__":
         self.__CHRO_MINVALUE = chromosomes.MINVALUE
         self.__CAN_REPETEAD_CHRO = can_repeated_chro
         self.__POOL = self.__Generate_pool()
-        self.__TEST_POOL = testing  # Flag for testing purpose
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.__run)
-
-
+        self.__TEST_POOL = testing
     """
         Function that generate a pool
     """
@@ -286,11 +302,10 @@ if __name__ ==  "__main__":
         child1 = copy.copy(item1)
         child2 = copy.copy(item2)
         split = randint(1, self.__N_CHROMOSOMES - 1)
-        child1[0:split] = copy.copy(child2[0:split])  # [item1[::split],item2[split::]]
-        child2[split:self.__N_CHROMOSOMES] = copy.copy(
-            item1[split:self.__N_CHROMOSOMES])  # [item2[::split],item1[split::]]
+        child1[split:] = copy.copy(child2[split:])  # [item1[::split],item2[split::]]
+        child2[split:] = copy.copy(item1[split:])  # [item2[::split],item1[split::]]
         if self.__CAN_REPETEAD_CHRO is False:
-            return self.__Replace_repeated(child1, child2, split)
+            return [self.__Replace_repeated(child1),self.__Replace_repeated(child2)]
         else:
             return [child1,child2]
 
@@ -308,30 +323,23 @@ if __name__ ==  "__main__":
                 f = (item1[i] + item2[i])/2
                 child[i] = int(math.floor(f))
         if self.__CAN_REPETEAD_CHRO is False:
-            n=self.__CHRO_MINVALUE
-            for i in range(self.__N_CHROMOSOMES):
-                if child[i] in child [i+1:]:
-                    while(True):
-                        if n not in child:
-                            child[i]=n
-                            break
-                        n+=1
+            self.__Replace_repeated(child)
         return child
 
     """
         Function that replace the chromosomes repeated
     """
 
-    def __Replace_repeated(self, child1, child2, split):
-        for i in range(0, split):
-            if child1[i] in child1[split:self.__N_CHROMOSOMES]:
-                for j in range(0, split):
-                    if child2[j] in child2[split:self.__N_CHROMOSOMES]:
-                        c1 = child1[i]
-                        child1[i] = child2[j]
-                        child2[j] = c1
+    def __Replace_repeated(self, child):
+        n = self.__CHRO_MINVALUE
+        for i in range(0,len(child)-1):
+            if child[i] in child[i + 1:]:
+                while (True):
+                    if n not in child:
+                        child[i] = n
                         break
-        return [child1, child2]
+                    n += 1
+        return child
 
     """
         Generate child main
@@ -447,7 +455,7 @@ if __name__ ==  "__main__":
         index.sort()
         a = copy.copy(item[index[0]:index[1]])
         b = copy.copy(item)
-        b[index[0]:index[1]] = copy.copy(sample(a, index[1] - index[0]))
+        b[index[0]:index[1]] = copy.copy(sample(a, len(b[index[0]:index[1]])))
         return b
 
     """
@@ -631,7 +639,7 @@ if __name__ ==  "__main__":
         """
         print s
 
-    def start(self,period=500):
+    def start(self,period=100):
         self.timer.start(period)
 
     def stop(self):
