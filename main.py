@@ -1,8 +1,7 @@
 import sys
 
 from gui import *
-from libGeneticAlgorithm.Chromosome import *
-from libGeneticAlgorithm.Genetic_Algorithm import *
+from libGeneticAlgorithm import *
 from scene import *
 
 pcities = [
