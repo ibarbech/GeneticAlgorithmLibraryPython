@@ -7,7 +7,9 @@ BLUE = QtCore.Qt.blue
 BLACK = QtCore.Qt.black
 YELLOW = QtCore.Qt.yellow
 GREEN = QtCore.Qt.green
+
 class SCENE(QtGui.QGraphicsScene):
+
     def __init__(self):
         QtGui.QGraphicsScene.__init__(self)
         self.__N_cities=0
