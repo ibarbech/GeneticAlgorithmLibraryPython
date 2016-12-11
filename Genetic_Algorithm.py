@@ -13,6 +13,7 @@ CHILD_FLIP = 10
 CHILD_SPLIT = 11
 CHILD_FLIP2 = 12
 CHILD_MEAN = 13
+CHILD_SPLIT2 = 14
 
 
 
@@ -26,6 +27,12 @@ class GenecticException(B):
 
 class chromosome_t():
     def __init__(self, n_chromosomes, maxvalue = None, minvalue = 0, chromosomes_is_float = False, ):
+        """
+        :param n_chromosomes: is the number of chromosomes that an individual has
+        :param maxvalue: is the maximum value of a chromosome
+        :param minvalue: is the minimum value of a chromosome
+        :param chromosomes_is_float: is True if the value of a chromosome can be float
+        """
         self.N_CHRO = n_chromosomes
         if maxvalue is None:
             self.MAXVALUE = n_chromosomes
@@ -178,6 +185,20 @@ if __name__ ==  "__main__":
 
     def setattrGeneticAlgorithm(self, fun_fitness, chromosomes, itmax = 50, child_type = CHILD_FLIP, selection_type = FILL_NEXT_GENERATION,
                  High_Low = False, size_pool = 1000, porcent_elitism = 10, porcent_mute = 2, can_repeated_chro = False, testing = False):
+        """
+        Set the params to instance, this function can raise a GeneticException
+        :param fun_fitness: is a pointer of function fitness
+        :param chromosomes: is a class of chromosomes_t
+        :param itmax: is a iteration max of funtion run
+        :param child_type: is a type of generate the next pool
+        :param selection_type: is a type of selection of individuos for generate the next pool
+        :param High_Low: is True if you search a individual which function fintness is max
+        :param size_pool: is the size of pool
+        :param porcent_elitism: is the percentage you want to keep in the pool
+        :param porcent_mute: is the percentage you want to keep in the group
+        :param can_repeated_chro: is True if the crhomosomes of individual can be repeated
+        :param testing:
+        """
         if selection_type not in [ROULETTE, FILL_NEXT_GENERATION]:
             a = GenecticException
             a.what = "Error: selection_type is not correct."
@@ -342,6 +363,16 @@ if __name__ ==  "__main__":
                     n += 1
         return child
 
+    def __Generate_Child_split_Selection(self, item1, item2):
+        """
+            Funtion that generate 2 child and return the best of the parents and childs
+        """
+        childs=self.__Generate_Child_split(item1, item2)
+        childs.append(item1)
+        childs.append(item2)
+        return self.__Tournament_Selection_Deterministic(childs)
+
+
     def __Generate_Child(self, item1, item2 = None):
         """
             Generate child main
@@ -354,6 +385,8 @@ if __name__ ==  "__main__":
             return self.__Generate_Child_split(item1, item2)
         elif self.__TYPECHILD is CHILD_MEAN:
             return self.__Generate_Child_Mean(item1, item2)
+        elif self.__TYPECHILD is CHILD_SPLIT2:
+            return self.__Generate_Child_split_Selection(item1,item2)
 
     def __Fill_Next_Generation(self):
         """
@@ -462,7 +495,9 @@ if __name__ ==  "__main__":
 
     def set_pool(self, pool):
         """
-            Asign a predefined pool and activate testing mode
+        Asign a predefined pool and activate testing mode
+        If size of individual is not correct raise GenecticException
+        :param pool: Is the population to be allocated: is of the type [[[individual],0,0],[[individual],0,0],...]
         """
         if self.__N_CHROMOSOMES is not len(pool[0][0]):
             a = GenecticException
@@ -473,14 +508,14 @@ if __name__ ==  "__main__":
 
     def get_empty_pool(self):
         """
-            Get a empty pool
+        :return: a empty pool of the type [[[0 for x in range(self.__N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_POOL)]
         """
         pool = [[[0 for x in range(self.__N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_POOL)]
         return pool
 
     def get_pool(self):
         """
-            Get the pool
+        :return: the current pool is of the type [[[individual],0,0],[[individual],0,0],...]
         """
         return copy.copy(self.__POOL)
 
@@ -493,13 +528,14 @@ if __name__ ==  "__main__":
 
     def Winner_Probability(self):
         """
-            Return the win individual
+        :return: the current winning individual
         """
         return self.__POOL[0][:]
 
     def run(self, print_best=0):
         """
-            Function main that run the algorithm
+        Function main that run the algorithm
+        :param print_best: If it is not 0, is printed top print_best
         """
         for x in range(self.__ITMAX):
             for i in range(self.__SIZE_POOL):
@@ -520,7 +556,14 @@ if __name__ ==  "__main__":
         print "\rThe winer is: ", self.Winner_Probability()
 
     def start(self,period=100):
+        """
+        Run a timer with period, this timer is connect with Function main that run the algorithm
+        :param period:
+        """
         self.timer.start(period)
 
     def stop(self):
+        """
+        This function for the timer.
+        """
         self.timer.stop()
