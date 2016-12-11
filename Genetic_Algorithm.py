@@ -635,6 +635,10 @@ if inspect.stack()[0][3] ==  "__main__":
         Run a timer with period, this timer is connect with Function main that run the algorithm
         :param period:
         """
+        if self.__FUN_FITNESS is None:
+            a = GenecticException
+            a.what = "Error: It is necessary to initialize the parameters with setattrGeneticAlgorithm"
+            raise a
         if DEBUG:
             print inspect.stack()[0][3]
         self.timer.start(period)
