@@ -242,11 +242,16 @@ def get_child_mode():
     if mode is 0:
         return CHILD_FLIP
     elif mode is 1:
-        return CHILD_SPLIT
+        return CHILD_FLIP_TOURNAMENT_DETERMINISTIC
     elif mode is 2:
-        return CHILD_FLIP2
-
+        return CHILD_FLIP_TOURNAMENT_PROBABILISTIC
     elif mode is 3:
+        return CHILD_SPLIT
+    elif mode is 4:
+        return CHILD_SPLIT_TOURNAMENT_DETERMINISTIC
+    elif mode is 5:
+        return CHILD_SPLIT_TOURNAMENT_PROBABILISTIC
+    elif mode is 6:
         return CHILD_MEAN
 
 def get_selection_mode():
@@ -261,7 +266,7 @@ def get_high_low():
 
 @QtCore.Slot()
 def start():
-    GA.start(100)
+    GA.start(300)
     timer.start(100)
 
 @QtCore.Slot()

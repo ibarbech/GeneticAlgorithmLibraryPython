@@ -36,12 +36,27 @@
            </item>
            <item>
             <property name="text">
+             <string>CHILD_FLIP_TOURNAMENT_DETERMINISTIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CHILD_FLIP_TOURNAMENT_PROBABILISTIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
              <string>CHILD_SPLIT</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>CHILD_FLIP2</string>
+             <string>CHILD_SPLIT_TOURNAMENT_DETERMINISTIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CHILD_SPLIT_TOURNAMENT_PROBABILISTIC</string>
             </property>
            </item>
            <item>

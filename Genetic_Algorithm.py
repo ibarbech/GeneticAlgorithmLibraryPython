@@ -5,17 +5,29 @@ import copy
 from time import *
 import math
 from PySide import QtCore
+import inspect
+
+DEBUG = False
 
 ROULETTE = 1
 FILL_NEXT_GENERATION = 2
 
 CHILD_FLIP = 10
 CHILD_SPLIT = 11
-CHILD_FLIP2 = 12
-CHILD_MEAN = 13
-CHILD_SPLIT2 = 14
+CHILD_FLIP_TOURNAMENT_DETERMINISTIC = 12
+CHILD_FLIP_TOURNAMENT_PROBABILISTIC = 13
+CHILD_MEAN = 14
+CHILD_SPLIT_TOURNAMENT_DETERMINISTIC = 15
+CHILD_SPLIT_TOURNAMENT_PROBABILISTIC = 16
 
+types_childs_1 = [CHILD_FLIP,CHILD_FLIP_TOURNAMENT_DETERMINISTIC,CHILD_FLIP_TOURNAMENT_PROBABILISTIC,CHILD_MEAN,
+                  CHILD_SPLIT_TOURNAMENT_DETERMINISTIC,CHILD_SPLIT_TOURNAMENT_PROBABILISTIC]
 
+types_childs_2 = [CHILD_SPLIT]
+
+types_Child = [CHILD_FLIP,CHILD_SPLIT,CHILD_MEAN,CHILD_FLIP_TOURNAMENT_DETERMINISTIC,CHILD_FLIP_TOURNAMENT_PROBABILISTIC,
+               CHILD_SPLIT_TOURNAMENT_DETERMINISTIC,CHILD_SPLIT_TOURNAMENT_PROBABILISTIC]
+types_selection= [FILL_NEXT_GENERATION,ROULETTE]
 
 class B(Exception):
     pass
@@ -142,7 +154,7 @@ def fitnnes(item):
     dist = dist + distance[cityant][item[0]]
     return dist
 
-if __name__ ==  "__main__":
+if inspect.stack()[0][3] ==  "__main__":
     print "["
     for x in distance:
         print x[:20], ","
@@ -160,6 +172,8 @@ if __name__ ==  "__main__":
         """
 
     def __init__(self):
+        if DEBUG:
+            print inspect.stack()[0][3]
         try:
             self.__ELITISM = None
             self.__MUTE = None
@@ -199,7 +213,9 @@ if __name__ ==  "__main__":
         :param can_repeated_chro: is True if the crhomosomes of individual can be repeated
         :param testing:
         """
-        if selection_type not in [ROULETTE, FILL_NEXT_GENERATION]:
+        if DEBUG:
+            print inspect.stack()[0][3]
+        if selection_type not in types_selection:
             a = GenecticException
             a.what = "Error: selection_type is not correct."
             raise a
@@ -218,6 +234,10 @@ if __name__ ==  "__main__":
         if chromosomes.CHRO_IS_F is can_repeated_chro and can_repeated_chro is not False:
             a = GenecticException
             a.what = "Error: If var 'chromosomes.CHRO_IS_F' is true 'can_repeated_chro' must be true"
+            raise a
+        if child_type not in types_Child:
+            a = GenecticException
+            a.what = "Error: child_type is not correct"
             raise a
         try:
             self.__ELITISM = porcent_elitism / 100.0
@@ -244,6 +264,8 @@ if __name__ ==  "__main__":
         """
             Function that generate a pool
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         if self.__CHRO_IS_F is False:
             if self.__CAN_REPETEAD_CHRO is False:
                 ind = range(self.__CHRO_MINVALUE, self.__CHRO_MAXVALUE)
@@ -261,12 +283,16 @@ if __name__ ==  "__main__":
         """
             Function that returns a key to sort pool
         """
+        #if DEBUG:
+        #    print inspect.stack()[0][3]
         return item[1]
 
     def __Get_Individuos(self, individual):
         """
             Function that returns a individuos i
         """
+        #if DEBUG:
+        #    print inspect.stack()[0][3]
         if individual not in range(0, self.__SIZE_POOL):
             a = GenecticException
             a.what = "Error: individual", individual, " not existing, 0 < = individual < " + str(self.__SIZE_POOL)
@@ -277,6 +303,8 @@ if __name__ ==  "__main__":
         """
             Function that set the Fittnes to sort pool
         """
+        #if DEBUG:
+        #    print inspect.stack()[0][3]
         if individual not in range(0, self.__SIZE_POOL):
             a = GenecticException
             a.what = "Error: individual", individual, " not existing, 0 < = individual < " + str(self.__SIZE_POOL)
@@ -287,12 +315,16 @@ if __name__ ==  "__main__":
         """
             Function that sort pool if rever is True sort of highest to lowest else lowest to highest
         """
+        #if DEBUG:
+        #    print inspect.stack()[0][3]
         self.__POOL.sort(key = self.__getKey, reverse = rever)
 
     def __Generate_Child_flip(self, item):
         """
             Generate a child by flip method
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         child = copy.copy(item)
         index = [randint(0, self.__N_CHROMOSOMES - 1), randint(0, self.__N_CHROMOSOMES - 1)]
         index.sort()
@@ -300,10 +332,12 @@ if __name__ ==  "__main__":
         child[index[0]:index[1]] = revert[::-1]
         return child
 
-    def __Generate_Child_tournament_Det(self, item):
+    def __Generate_Child_Flip_tournament(self, item):
         """
             Generate two sons by flip method, after that it returns the best between Father and the two sons.
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         child = copy.copy(item)
         index = [randint(0, self.__N_CHROMOSOMES - 1), randint(0, self.__N_CHROMOSOMES - 1)]
         index.sort()
@@ -317,12 +351,17 @@ if __name__ ==  "__main__":
         child2[index[1]:self.__N_CHROMOSOMES - 1] = revert2right[::-1]
 
         listIndividual = [item, child, child2]
-        return self.__Tournament_Selection_Deterministic(listIndividual)
+        if self.__TYPECHILD is CHILD_FLIP_TOURNAMENT_DETERMINISTIC:
+            return self.__Tournament_Selection_Deterministic(listIndividual)
+        elif self.__TYPECHILD is CHILD_FLIP_TOURNAMENT_PROBABILISTIC:
+            return self.__Tournament_Selection_Probabilistic(listIndividual)
 
     def __Generate_Child_split(self, item1, item2):
         """
             Generate two sons by split method
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         child1 = copy.copy(item1)
         child2 = copy.copy(item2)
         split = randint(1, self.__N_CHROMOSOMES - 1)
@@ -337,6 +376,8 @@ if __name__ ==  "__main__":
         """
             Generate a child by mean method
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         child = copy.copy(item1)
         if self.__CHRO_IS_F is True:
             for i in range(self.__N_CHROMOSOMES):
@@ -353,6 +394,8 @@ if __name__ ==  "__main__":
         """
             Function that replace the chromosomes repeated
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         n = self.__CHRO_MINVALUE
         for i in range(0,len(child)-1):
             if child[i] in child[i + 1:]:
@@ -363,44 +406,52 @@ if __name__ ==  "__main__":
                     n += 1
         return child
 
-    def __Generate_Child_split_Selection(self, item1, item2):
+    def __Generate_Child_split_tournament(self, item1, item2):
         """
             Funtion that generate 2 child and return the best of the parents and childs
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         childs=self.__Generate_Child_split(item1, item2)
         childs.append(item1)
         childs.append(item2)
-        return self.__Tournament_Selection_Deterministic(childs)
-
+        if self.__TYPECHILD is CHILD_SPLIT_TOURNAMENT_DETERMINISTIC:
+            return self.__Tournament_Selection_Deterministic(childs)
+        elif self.__TYPECHILD is CHILD_SPLIT_TOURNAMENT_PROBABILISTIC:
+            return self.__Tournament_Selection_Probabilistic(childs)
 
     def __Generate_Child(self, item1, item2 = None):
         """
             Generate child main
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         if self.__TYPECHILD is CHILD_FLIP:
             return self.__Generate_Child_flip(item1)
-        elif self.__TYPECHILD is CHILD_FLIP2:
-            return self.__Generate_Child_tournament_Det(item1)
+        elif self.__TYPECHILD in [CHILD_FLIP_TOURNAMENT_DETERMINISTIC, CHILD_FLIP_TOURNAMENT_PROBABILISTIC]:
+            return self.__Generate_Child_Flip_tournament(item1)
         elif self.__TYPECHILD is CHILD_SPLIT:
             return self.__Generate_Child_split(item1, item2)
         elif self.__TYPECHILD is CHILD_MEAN:
             return self.__Generate_Child_Mean(item1, item2)
-        elif self.__TYPECHILD is CHILD_SPLIT2:
-            return self.__Generate_Child_split_Selection(item1,item2)
+        elif self.__TYPECHILD in [CHILD_SPLIT_TOURNAMENT_DETERMINISTIC,CHILD_SPLIT_TOURNAMENT_PROBABILISTIC]:
+            return self.__Generate_Child_split_tournament(item1, item2)
 
     def __Fill_Next_Generation(self):
         """
             Function that fill the pool
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         new_pull = copy.copy(self.__POOL)
-        if self.__TYPECHILD in [CHILD_FLIP, CHILD_FLIP2, CHILD_MEAN]:
+        if self.__TYPECHILD in types_childs_1:
             for i in (range(0, self.__rangechild)):
                 child = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2 = self.__POOL[i+1][0])
                 dest = i + self.__sizeelitism
                 if randint(0, 99) < self.__MUTE:
                     child = self.__mute_individuals(child)
                 new_pull[dest][0] = copy.copy(child)
-        elif self.__TYPECHILD in [CHILD_SPLIT]:
+        elif self.__TYPECHILD in types_childs_2:
             for i in (range(0, self.__rangechild, 2)):
                 childs = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2 = copy.copy(self.__POOL[i + 1][0]))
                 dest = i + self.__sizeelitism
@@ -414,6 +465,8 @@ if __name__ ==  "__main__":
         """
             Function that select the best item from a list of items for tournament selection.
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         dict = {}
         for i in range(0, len(listItems)):
             dict[i] = self.__FUN_FITNESS(listItems[i])
@@ -423,19 +476,23 @@ if __name__ ==  "__main__":
         """
             Function that select the best item from a list of items for tournament selection.
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         return listItems[randint(0, len(listItems) - 1)]
 
     def __Roulette(self):
         """
             Function that selct the individuos to fill next pool
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         new_pool = copy.copy(self.__POOL)
         for i in (range(1, self.__SIZE_POOL)):
             self.__POOL[i][1] = self.__POOL[i][1] + self.__POOL[i - 1][1]
         for i in (range(0, self.__SIZE_POOL)):
             self.__POOL[i][2] = 1 - (self.__POOL[i][1] / self.__POOL[self.__SIZE_POOL - 1][1])
 
-        if self.__TYPECHILD in [CHILD_FLIP, CHILD_FLIP2, CHILD_MEAN]:
+        if self.__TYPECHILD in types_childs_1:
             for i in (range(0, self.__rangechild)):
                 selec = random()
                 for j in range(0, self.__SIZE_POOL)[::-1]:
@@ -446,7 +503,7 @@ if __name__ ==  "__main__":
                 if randint(0, 99) < self.__MUTE:
                     child = self.__mute_individuals(child)
                 new_pool[dest][0] = copy.copy(child)
-        elif self.__TYPECHILD in [CHILD_SPLIT]:
+        elif self.__TYPECHILD in types_childs_2:
             for i in (range(0, self.__rangechild, 2)):
                 selec1 = random()
                 selec2 = random()
@@ -468,6 +525,8 @@ if __name__ ==  "__main__":
         """
             Function main for fill next pool, this call the different forms the generate next pool
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         if self.__SELECTION_TYPE is FILL_NEXT_GENERATION:
             self.__Fill_Next_Generation()
         elif self.__SELECTION_TYPE is ROULETTE:
@@ -477,6 +536,8 @@ if __name__ ==  "__main__":
         """
             Function that mute a individuos
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         index = [randint(0, self.__N_CHROMOSOMES - 1), randint(0, self.__N_CHROMOSOMES - 1)]
         index.sort()
         a = copy.copy(item[index[0]:index[1]])
@@ -486,6 +547,8 @@ if __name__ ==  "__main__":
 
     @QtCore.Slot()
     def __run(self):
+        if DEBUG:
+            print inspect.stack()[0][3]
         for i in range(self.__SIZE_POOL):
             item = self.__Get_Individuos(i)
             self.__Set_Fittnes(i, self.__FUN_FITNESS(item))
@@ -499,6 +562,8 @@ if __name__ ==  "__main__":
         If size of individual is not correct raise GenecticException
         :param pool: Is the population to be allocated: is of the type [[[individual],0,0],[[individual],0,0],...]
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         if self.__N_CHROMOSOMES is not len(pool[0][0]):
             a = GenecticException
             a.what = "Error: the size of the individuos of pool is not correct."
@@ -510,6 +575,8 @@ if __name__ ==  "__main__":
         """
         :return: a empty pool of the type [[[0 for x in range(self.__N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_POOL)]
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         pool = [[[0 for x in range(self.__N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_POOL)]
         return pool
 
@@ -517,12 +584,16 @@ if __name__ ==  "__main__":
         """
         :return: the current pool is of the type [[[individual],0,0],[[individual],0,0],...]
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         return copy.copy(self.__POOL)
 
     def print_individuals(self):
         """
             Print the individuals of the pool
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         for i in range(0, self.__SIZE_POOL):
             print self.__POOL[i][:]
 
@@ -530,6 +601,8 @@ if __name__ ==  "__main__":
         """
         :return: the current winning individual
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         return self.__POOL[0][:]
 
     def run(self, print_best=0):
@@ -537,6 +610,8 @@ if __name__ ==  "__main__":
         Function main that run the algorithm
         :param print_best: If it is not 0, is printed top print_best
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         for x in range(self.__ITMAX):
             for i in range(self.__SIZE_POOL):
                 item = self.__Get_Individuos(i)
@@ -560,10 +635,14 @@ if __name__ ==  "__main__":
         Run a timer with period, this timer is connect with Function main that run the algorithm
         :param period:
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         self.timer.start(period)
 
     def stop(self):
         """
         This function for the timer.
         """
+        if DEBUG:
+            print inspect.stack()[0][3]
         self.timer.stop()
