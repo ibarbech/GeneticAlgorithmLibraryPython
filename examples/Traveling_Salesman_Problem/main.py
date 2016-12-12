@@ -1,7 +1,5 @@
-import sys
-
 import TSP_gui
-from GeneticAlgorithm_gui import *
+from GeneticAlgorithm.GeneticAlgorithm_gui import *
 from scene import *
 
 pcities = [
