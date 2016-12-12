@@ -152,7 +152,7 @@ if inspect.stack()[0][3] ==  "__main__":
             self.__REVERSE = None
             self.__SELECTION_TYPE = None
             self.__SIZE_POOL = None
-            self.__N_CHROMOSOMES = None
+            self._N_CHROMOSOMES = None
             self.__FUN_FITNESS = None
             self.__ITMAX = None
             self.__TYPECHILD = None
@@ -217,7 +217,7 @@ if inspect.stack()[0][3] ==  "__main__":
             self.__REVERSE = High_Low
             self.__SELECTION_TYPE = selection_type
             self.__SIZE_POOL = size_pool
-            self.__N_CHROMOSOMES = chromosomes.N_CHRO
+            self._N_CHROMOSOMES = chromosomes.N_CHRO
             self.__FUN_FITNESS = fun_fitness
             self.__ITMAX = itmax
             self.__TYPECHILD = child_type
@@ -241,13 +241,13 @@ if inspect.stack()[0][3] ==  "__main__":
         if self.__CHRO_IS_F is False:
             if self.__CAN_REPETEAD_CHRO is False:
                 ind = range(self.__CHRO_MINVALUE, self.__CHRO_MAXVALUE)
-                new_pool = [[sample(ind, self.__N_CHROMOSOMES), 0, 0] for y in range(self.__SIZE_POOL)]
+                new_pool = [[sample(ind, self._N_CHROMOSOMES), 0, 0] for y in range(self.__SIZE_POOL)]
             else:
-                new_pool = [[[randint(self.__CHRO_MINVALUE,self.__CHRO_MAXVALUE)for x in range(self.__N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_POOL)]
+                new_pool = [[[randint(self.__CHRO_MINVALUE,self.__CHRO_MAXVALUE) for x in range(self._N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_POOL)]
             return new_pool
         else:
             new_pool = [
-                [[uniform(self.__CHRO_MINVALUE, self.__CHRO_MAXVALUE) for x in range(self.__N_CHROMOSOMES)], 0, 0] for y
+                [[uniform(self.__CHRO_MINVALUE, self.__CHRO_MAXVALUE) for x in range(self._N_CHROMOSOMES)], 0, 0] for y
                 in range(self.__SIZE_POOL)]
             return new_pool
 
@@ -298,7 +298,7 @@ if inspect.stack()[0][3] ==  "__main__":
         if DEBUG:
             print inspect.stack()[0][3]
         child = copy.copy(item)
-        index = [randint(0, self.__N_CHROMOSOMES - 1), randint(0, self.__N_CHROMOSOMES - 1)]
+        index = [randint(0, self._N_CHROMOSOMES - 1), randint(0, self._N_CHROMOSOMES - 1)]
         index.sort()
         revert = copy.copy(item[index[0]:index[1]])
         child[index[0]:index[1]] = revert[::-1]
@@ -311,16 +311,16 @@ if inspect.stack()[0][3] ==  "__main__":
         if DEBUG:
             print inspect.stack()[0][3]
         child = copy.copy(item)
-        index = [randint(0, self.__N_CHROMOSOMES - 1), randint(0, self.__N_CHROMOSOMES - 1)]
+        index = [randint(0, self._N_CHROMOSOMES - 1), randint(0, self._N_CHROMOSOMES - 1)]
         index.sort()
         revert = copy.copy(item[index[0]:index[1]])
         child[index[0]:index[1]] = revert[::-1]
 
         child2 = copy.copy(item)
         revert2left = child2[0:index[0]]
-        revert2right = child2[index[1]: self.__N_CHROMOSOMES - 1]
+        revert2right = child2[index[1]: self._N_CHROMOSOMES - 1]
         child2[0:index[0]] = revert2left[::-1]
-        child2[index[1]:self.__N_CHROMOSOMES - 1] = revert2right[::-1]
+        child2[index[1]:self._N_CHROMOSOMES - 1] = revert2right[::-1]
 
         listIndividual = [item, child, child2]
         if self.__TYPECHILD is CHILD_FLIP_TOURNAMENT_DETERMINISTIC:
@@ -336,7 +336,7 @@ if inspect.stack()[0][3] ==  "__main__":
             print inspect.stack()[0][3]
         child1 = copy.copy(item1)
         child2 = copy.copy(item2)
-        split = randint(1, self.__N_CHROMOSOMES - 1)
+        split = randint(1, self._N_CHROMOSOMES - 1)
         child1[split:] = copy.copy(child2[split:])  # [item1[::split],item2[split::]]
         child2[split:] = copy.copy(item1[split:])  # [item2[::split],item1[split::]]
         if self.__CAN_REPETEAD_CHRO is False:
@@ -352,10 +352,10 @@ if inspect.stack()[0][3] ==  "__main__":
             print inspect.stack()[0][3]
         child = copy.copy(item1)
         if self.__CHRO_IS_F is True:
-            for i in range(self.__N_CHROMOSOMES):
+            for i in range(self._N_CHROMOSOMES):
                 child[i] = (item1[i]+item2[1])/2
         else:
-            for i in range(self.__N_CHROMOSOMES):
+            for i in range(self._N_CHROMOSOMES):
                 f = (item1[i] + item2[i])/2
                 child[i] = int(math.floor(f))
         if self.__CAN_REPETEAD_CHRO is False:
@@ -510,7 +510,7 @@ if inspect.stack()[0][3] ==  "__main__":
         """
         if DEBUG:
             print inspect.stack()[0][3]
-        index = [randint(0, self.__N_CHROMOSOMES - 1), randint(0, self.__N_CHROMOSOMES - 1)]
+        index = [randint(0, self._N_CHROMOSOMES - 1), randint(0, self._N_CHROMOSOMES - 1)]
         index.sort()
         a = copy.copy(item[index[0]:index[1]])
         b = copy.copy(item)
@@ -536,7 +536,7 @@ if inspect.stack()[0][3] ==  "__main__":
         """
         if DEBUG:
             print inspect.stack()[0][3]
-        if self.__N_CHROMOSOMES is not len(pool[0][0]):
+        if self._N_CHROMOSOMES is not len(pool[0][0]):
             a = GenecticException
             a.what = "Error: the size of the individuos of pool is not correct."
             raise a
@@ -549,7 +549,7 @@ if inspect.stack()[0][3] ==  "__main__":
         """
         if DEBUG:
             print inspect.stack()[0][3]
-        pool = [[[0 for x in range(self.__N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_POOL)]
+        pool = [[[0 for x in range(self._N_CHROMOSOMES)], 0, 0] for y in range(self.__SIZE_POOL)]
         return pool
 
     def get_pool(self):

@@ -19,14 +19,16 @@ class GeneticAlgorithm_gui(GeneticAlgorithm):
 
     def __init__(self):
         GeneticAlgorithm.__init__(self)
-        app = QtGui.QApplication(sys.argv)
+        #app = QtGui.QApplication(sys.argv)
         self.Dialog = QtGui.QDialog()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self.Dialog)
         self.Dialog.showMaximized()
         QtCore.QTimer.connect(self.ui.Aceptar_Cancelar, QtCore.SIGNAL("accepted()"), self.Aceptar)
         QtCore.QTimer.connect(self.ui.Aceptar_Cancelar, QtCore.SIGNAL("rejected()"), self.Cancelar)
-        app.exec_()
+        self.Dialog.exec_()
+
+        #app.exec_()
 
     def Aceptar(self):
         f = open("temp_Fun_fitness.py", 'w')
@@ -60,5 +62,7 @@ class GeneticAlgorithm_gui(GeneticAlgorithm):
             os.remove("temp_Fun_fitness.py")
         except:
             pass
-        
-ga=GeneticAlgorithm_gui()
+
+    def get_N_Chrom(self):
+        return self._N_CHROMOSOMES
+
