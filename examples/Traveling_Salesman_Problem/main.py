@@ -1,7 +1,7 @@
 import sys
 
 from gui import *
-from libGeneticAlgorithm import *
+from GeneticAlgorithm import *
 from scene import *
 
 pcities = [
