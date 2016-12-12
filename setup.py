@@ -9,5 +9,5 @@ setup(name="Aplicacion de ejemplo",
 #      url="",
       license="GPL",
 #      scripts=["ejemplo.py"],
-      packages=["GeneticAlgorithm"]
+      packages=["GeneticAlgorithm","GeneticAlgorithm/GeneticAlgorithm_gui"]
       )
