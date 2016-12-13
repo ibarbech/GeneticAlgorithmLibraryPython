@@ -1,6 +1,8 @@
-from GeneticAlgorithm import *
+import os
+
+from GeneticAlgorithm.Genetic_Algorithm import *
+from GeneticAlgorithm.Genetic_Algorithm_attr import GeneticAlgorithm_Attr_t
 from gui import *
-import sys,os
 
 
 def _checkStatetobool(checkbox):
@@ -44,13 +46,15 @@ class GeneticAlgorithm_gui(GeneticAlgorithm):
             minv = int(self.ui.Chrm_min.text())
         chrom = chromosome_t(self.ui.N_Chrom.value(), maxvalue=maxv, minvalue=minv,
                              chromosomes_is_float=_checkStatetobool(self.ui.Chrm_is_F))
-        GeneticAlgorithm.setattrGeneticAlgorithm(self, fun_fitness, chromosomes=chrom, itmax=self.ui.Itmax.value(),
+        GA_attr=GeneticAlgorithm_Attr_t(fun_fitness, chromosomes=chrom, itmax=self.ui.Itmax.value(),
                                                  child_type=_getChildMode(self.ui.Child_mode.currentIndex()),
                                                  selection_type=_getSelectionMode(self.ui.Selection_mode.currentIndex()),
                                                  High_Low=_checkStatetobool(self.ui.High_Low),
                                                  size_pool=self.ui.Size_of_pool.value(),
                                                  porcent_elitism=self.ui.Elitism.value(), porcent_mute=self.ui.Mute.value(),
                                                  can_repeated_chro=_checkStatetobool(self.ui.Chrm_can_repetead))
+        GeneticAlgorithm.setattrGeneticAlgorithm(self,GA_attr)
+
         self.Dialog.close()
 
     def Cancelar(self):
@@ -63,6 +67,4 @@ class GeneticAlgorithm_gui(GeneticAlgorithm):
         except:
             pass
 
-    def get_N_Chrom(self):
-        return self._N_CHROMOSOMES
 

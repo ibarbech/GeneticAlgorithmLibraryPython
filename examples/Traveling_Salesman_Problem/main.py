@@ -1,4 +1,4 @@
-import TSP_gui
+import TSP_gui,sys
 from GeneticAlgorithm.GeneticAlgorithm_gui import *
 from scene import *
 
@@ -274,7 +274,7 @@ class main():
     def init(self):
         try:
             self.GA=GeneticAlgorithm_gui()
-            self.scenev.set_listCities(pcities[:self.GA.get_N_Chrom()])
+            self.scenev.set_listCities(pcities[:self.GA.getattrGemeticAlgorithm().N_CHROMOSOMES])
             self.scenev.RePaint()
             scale = [self.ui.graphicsView.width() / self.scenev.width() - 0.01, self.ui.graphicsView.height() / self.scenev.height() - 0.01]
             scale.sort()
