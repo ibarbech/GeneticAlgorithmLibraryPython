@@ -359,14 +359,20 @@ if inspect.stack()[0][3] ==  "__main__":
         new_pull = copy.copy(self.__POOL)
         if self.__attr.TYPECHILD in types_childs_1:
             for i in (range(0, self.__attr.rangechild)):
-                child = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2 = self.__POOL[i+1][0])
+                if(i is not self.__attr.rangechild):
+                    child = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2 = self.__POOL[i+1][0])
+                else:
+                    child = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2=self.__POOL[i - 1][0])
                 dest = i + self.__attr.sizeelitism
                 if randint(0, 99) < self.__attr.MUTE:
                     child = self.mute_individuals(child)
                 new_pull[dest][0] = copy.copy(child)
         elif self.__attr.TYPECHILD in types_childs_2:
             for i in (range(0, self.__attr.rangechild, 2)):
-                childs = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2 = copy.copy(self.__POOL[i + 1][0]))
+                if (i is not self.__attr.rangechild):
+                    childs = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2 = copy.copy(self.__POOL[i + 1][0]))
+                else:
+                    childs = self.__Generate_Child(copy.copy(self.__POOL[i][0]), item2=self.__POOL[i - 1][0])
                 dest = i + self.__attr.sizeelitism
                 for j in [0,1]:
                     if randint(0, 99) < self.__attr.MUTE:
@@ -380,10 +386,12 @@ if inspect.stack()[0][3] ==  "__main__":
         """
         if DEBUG:
             print inspect.stack()[0][3]
-        dict = {}
+        dict = [[0,0]for x in range(len(listItems))]
         for i in range(0, len(listItems)):
-            dict[i] = self.__attr.FUN_FITNESS(listItems[i])
-        return listItems[sorted(dict, reverse = True)[0]]
+            dict[i][1] = self.__attr.FUN_FITNESS(listItems[i])
+            dict[i][0] = listItems[i]
+        dict.sort(key=self.__getKey,reverse=self.__attr.REVERSE)
+        return dict[0][0]
 
     def __Tournament_Selection_Probabilistic(self, listItems):
         """

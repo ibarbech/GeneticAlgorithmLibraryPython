@@ -208,7 +208,7 @@ distance = [[9223372036854775807, 1511.4843697504782, 185.94622878671134, 1079.1
 def Fitness(item):
     dist = 0
     cityant = item[0]
-    for cityact in item[1:20]:
+    for cityact in item[1:len(item)]:
         dist = dist + distance[cityant][cityact]
         cityant = cityact
     dist = dist + distance[cityant][item[0]]
@@ -229,6 +229,7 @@ class main():
         self.scenev = None
         self.winneract=None
         self.winnerant=None
+        self.scaleant=None
         app = QtGui.QApplication(sys.argv)
         Dialog = QtGui.QDialog()
         self.ui = TSP_gui.Ui_Dialog()
@@ -262,8 +263,8 @@ class main():
 
     @QtCore.Slot()
     def start(self):
-        self.GA.start(100)
-        self.timer.start(100)
+        self.GA.start(0)
+        self.timer.start(0)
 
     @QtCore.Slot()
     def stop(self):
@@ -278,12 +279,12 @@ class main():
             self.scenev.RePaint()
             scale = [self.ui.graphicsView.width() / self.scenev.width() - 0.01, self.ui.graphicsView.height() / self.scenev.height() - 0.01]
             scale.sort()
-            if scale[0] != self.init.scaleant:
+            print self.scaleant , scale[0]
+            if self.scaleant != scale[0]:
                 self.ui.graphicsView.scale(scale[0], scale[0])
-                self.init.scaleant = scale[0]
+                self.scaleant = scale[0]
         except:
             pass
-    init.scaleant=None
 
 if __name__ ==  "__main__":
     main()
