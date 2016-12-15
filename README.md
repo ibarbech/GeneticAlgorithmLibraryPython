@@ -8,6 +8,11 @@ You can :
   - Define your fitness function, to fit the problem.
   - Adjust almost all parameters of the algorithm.
 
+Web 
+---------
+Please feel free to visit our [website](https://ibarbech.github.io/GeneticAlgorithmLibraryPython/).
+
+
 Some history of the project
 ---------
 
