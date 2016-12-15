@@ -25,8 +25,6 @@ This project started as a project for an university subject of bio-inspired comp
 Our library uses a few open source projects to work properly:
 
 * PySide - For creating the User interface.
-* Numpy - For array and number operations.
-* Pyparsing - For work with strings.
 
 
 And of course the library itself is open source with a [public repository](https://github.com/ibarbech/GeneticAlgorithmLibraryPython)
