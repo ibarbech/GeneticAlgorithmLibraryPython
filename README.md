@@ -69,10 +69,9 @@ Want to contribute? Great!
 
 Feel free to modify the code and submit a pull request, we will integrate it on the repository version.
 
-You can contact us in our GitHub profiles
-    - [Ivan Barbecho]  
-    - [Juan Pedro Torres]
-
+You can contact us in our GitHub profiles :
+- [Ivan Barbecho]  
+- [Juan Pedro Torres]
 
 ### Todos
 
