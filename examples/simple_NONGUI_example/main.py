@@ -1,4 +1,6 @@
 from GeneticAlgorithm.Genetic_Algorithm import *
+from GeneticAlgorithm.Genetic_Algorithm_attr import *
+from GeneticAlgorithm.Chromosome import *
 
 """
 
@@ -47,14 +49,14 @@ GA = GeneticAlgorithm()
 
 """
 chrom = chromosome_t(10, maxvalue=10, minvalue=0,
-                     chromosomes_is_float=True)
+                     chromosomes_is_float=False)
 
 """
 
 Configure the attr of the algorithm, child gen, selection type,pool size, elitism, mutation, etc
 
 """
-GA_attr = GeneticAlgorithm_Attr_t(fitness, chromosomes=chrom, itmax=1000,
+GA_attr = GeneticAlgorithm_Attr_t(fitness, chromosomes=chrom, itmax=500,
                                   child_type=CHILD_FLIP,
                                   selection_type=FILL_NEXT_GENERATION,
                                   High_Low=False,
