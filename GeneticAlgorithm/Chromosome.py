@@ -2,8 +2,11 @@ class chromosome_t():
 
     def __init__(self, n_chromosomes, maxvalue = None, minvalue = 0, chromosomes_is_float = False, ):
         """
+        Chromosome class, each indiviual will have n_chromosomes chromosomes , each one on the 
+        interval of values [minvalue,maxvalue)
+        
         :param n_chromosomes: is the number of chromosomes that an individual has
-        :param maxvalue: is the maximum value of a chromosome
+        :param maxvalue: is the next number to the maximum value of a chromosome
         :param minvalue: is the minimum value of a chromosome
         :param chromosomes_is_float: is True if the value of a chromosome can be float
         """
