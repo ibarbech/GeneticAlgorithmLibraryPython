@@ -45,7 +45,7 @@ $ cd GeneticAlgorithmPythonLibrary
 $ sudo install.sh
 ```
 
-If you can launch the script...
+If you can't launch the script...
 
 ```sh
 $ sudo chmod 557 install.sh
@@ -73,7 +73,8 @@ You can contact us in our GitHub profiles :
 
 ### Todos
 
- - Example of use in a implementation
+ -  ~~Example of use in a implementation (GUI) (NONGUI)~~
+ - Update help information
  - Release a stable version
  - Add Code Comments
  - Comparison between methods
