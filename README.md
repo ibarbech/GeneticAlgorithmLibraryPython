@@ -75,6 +75,7 @@ You can contact us in our GitHub profiles :
 
  -  ~~Example of use in a implementation (GUI) (NONGUI)~~
  - Update help information
+ - Mutation methods
  - Release a stable version
  - Add Code Comments
  - Comparison between methods
