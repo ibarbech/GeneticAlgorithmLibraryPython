@@ -202,7 +202,7 @@
              </item>
              <item>
               <property name="text">
-               <string>CHILD_FLIP_TOURNAMENT_PROBABILISTIC</string>
+               <string>CHILD_FLIP_TOURNAMENT_RANDOM</string>
               </property>
              </item>
              <item>
@@ -217,7 +217,7 @@
              </item>
              <item>
               <property name="text">
-               <string>CHILD_SPLIT_TOURNAMENT_PROBABILISTIC</string>
+               <string>CHILD_SPLIT_TOURNAMENT_RANDOM</string>
               </property>
              </item>
             </widget>
